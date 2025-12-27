@@ -1,31 +1,46 @@
 #include <iostream>
 #include <algorithm>
-#include <map>
+#include <vector>
+#include <set>
+
+void serch(std::vector<std::set<int>> const &nodes, std::vector<int> &visited, int node)
+{
+  for (const auto &s : nodes[node])
+  {
+    if (visited[s] == 0)
+    {
+      visited[s] = 1;
+      serch(nodes, visited, s);
+    }
+  }
+}
 
 int main()
 {
-  int N;
-  std::cin >> N;
+  int N, M;
+  std::cin >> N >> M;
 
-  std::map<int, int> m;
-
-  int ans = -1;
-  for (int i = 0; i < N; i++)
+  std::vector<std::set<int>> nodes(N);
+  for (int i = 0; i < M; i++)
   {
-    int n;
-    std::cin >> n;
+    int a, b;
+    std::cin >> a >> b;
 
-    if (m.find(n) != m.end())
-    {
-      if (ans > (i - m[n] + 1) || (ans == -1))
-        ans = i - m[n] + 1;
-    }
-
-    else
-      m[n] = i;
+    nodes[a - 1].insert(b - 1);
+    nodes[b - 1].insert(a - 1);
   }
 
-  std::cout << ans << std::endl;
+  std::vector<int> visited(N, 0);
+  int k = 0;
+  for (int i = 0; i < N; i++)
+  {
+    if (visited[i] == 0)
+    {
+      visited[i] = 1;
+      k++;
+      serch(nodes, visited, i);
+    }
+  }
 
-  return 0;
+  std::cout << M - (N - k) << std::endl;
 }
