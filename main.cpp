@@ -1,46 +1,36 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-#include <set>
-
-void serch(std::vector<std::set<int>> const &nodes, std::vector<int> &visited, int node)
-{
-  for (const auto &s : nodes[node])
-  {
-    if (visited[s] == 0)
-    {
-      visited[s] = 1;
-      serch(nodes, visited, s);
-    }
-  }
-}
 
 int main()
 {
-  int N, M;
-  std::cin >> N >> M;
+  int N;
+  std::cin >> N;
 
-  std::vector<std::set<int>> nodes(N);
-  for (int i = 0; i < M; i++)
-  {
-    int a, b;
-    std::cin >> a >> b;
+  std::vector<std::pair<int, int>> stack = {{0, 0}};
 
-    nodes[a - 1].insert(b - 1);
-    nodes[b - 1].insert(a - 1);
-  }
-
-  std::vector<int> visited(N, 0);
-  int k = 0;
   for (int i = 0; i < N; i++)
   {
-    if (visited[i] == 0)
+    int n;
+    std::cin >> n;
+
+    if (stack.back().first == n)
     {
-      visited[i] = 1;
-      k++;
-      serch(nodes, visited, i);
+      stack.back().second++;
+
+      if (stack.back().second >= 4)
+        stack.pop_back();
+    }
+    else
+    {
+      stack.push_back({n, 1});
     }
   }
 
-  std::cout << M - (N - k) << std::endl;
+  int ans = 0;
+  for (const auto &p : stack)
+    ans += p.second;
+
+  std::cout << ans << std::endl;
+
+  return 0;
 }
