@@ -1,36 +1,72 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <cmath>
 
-int main()
+typedef long long int ll;
+
+ll int_pow(ll a, ll t)
 {
-  int N;
-  std::cin >> N;
+  ll res = 1;
+  for (int i = 0; i < t; i++)
+    res *= a;
+  return res;
+}
 
-  std::vector<std::pair<int, int>> stack = {{0, 0}};
+ll count(ll r)
+{
 
-  for (int i = 0; i < N; i++)
+  ll high = r;
+  std::vector<int> digits;
+  while (high)
   {
-    int n;
-    std::cin >> n;
+    digits.push_back(high % 10);
+    high /= 10;
+  }
 
-    if (stack.back().first == n)
+  std::reverse(digits.begin(), digits.end());
+  int n = digits.size();
+
+  ll res = 0;
+  for (int i = 1; i <= n; i++)
+  {
+    if (i == n)
     {
-      stack.back().second++;
-
-      if (stack.back().second >= 4)
-        stack.pop_back();
+      res++;
+      break;
     }
+
+    else
+      res += int_pow(digits[0], n - 1 - i) * std::min(digits[0], digits[i]);
+
+    if (digits[0] <= digits[i])
+      break;
+  }
+
+  for (int i = 0; i < n; i++)
+  {
+    if (i == 0)
+    {
+      for (int j = 1; j < digits[0]; j++)
+        res += int_pow(j, n - i - 1);
+    }
+
     else
     {
-      stack.push_back({n, 1});
+      for (int j = 1; j <= 9; j++)
+        res += int_pow(j, n - i - 1);
     }
   }
 
-  int ans = 0;
-  for (const auto &p : stack)
-    ans += p.second;
+  return res;
+}
 
-  std::cout << ans << std::endl;
+int main()
+{
+  ll l, r;
+  std::cin >> l >> r;
+
+  std::cout << count(r) - count(l - 1) << std::endl;
 
   return 0;
 }
