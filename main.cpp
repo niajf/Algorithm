@@ -1,72 +1,67 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
-#include <cmath>
+#include <string>
 
-typedef long long int ll;
-
-ll int_pow(ll a, ll t)
+bool insert(std::string const &s, std::string const &t)
 {
-  ll res = 1;
-  for (int i = 0; i < t; i++)
-    res *= a;
-  return res;
+
+  int offset = 0;
+  int c = 0;
+  for (int i = 0; i < s.size(); i++)
+  {
+    if (s[i] != t[i + offset])
+    {
+      c++;
+      offset++;
+      if (c > 1)
+        return false;
+    }
+  }
+
+  return true;
 }
 
-ll count(ll r)
+bool change(std::string const &s, std::string const &t)
 {
-
-  ll high = r;
-  std::vector<int> digits;
-  while (high)
+  int c = 0;
+  for (int i = 0; i < s.size(); i++)
   {
-    digits.push_back(high % 10);
-    high /= 10;
-  }
-
-  std::reverse(digits.begin(), digits.end());
-  int n = digits.size();
-
-  ll res = 0;
-  for (int i = 1; i <= n; i++)
-  {
-    if (i == n)
+    if (s[i] != t[i])
     {
-      res++;
-      break;
-    }
-
-    else
-      res += int_pow(digits[0], n - 1 - i) * std::min(digits[0], digits[i]);
-
-    if (digits[0] <= digits[i])
-      break;
-  }
-
-  for (int i = 0; i < n; i++)
-  {
-    if (i == 0)
-    {
-      for (int j = 1; j < digits[0]; j++)
-        res += int_pow(j, n - i - 1);
-    }
-
-    else
-    {
-      for (int j = 1; j <= 9; j++)
-        res += int_pow(j, n - i - 1);
+      c++;
+      if (c > 1)
+        return false;
     }
   }
-
-  return res;
+  return true;
 }
 
 int main()
 {
-  ll l, r;
-  std::cin >> l >> r;
+  int k;
+  std::cin >> k;
 
-  std::cout << count(r) - count(l - 1) << std::endl;
+  std::string s, t;
+  std::cin >> s >> t;
+
+  bool ok = false;
+
+  if (s == t)
+    ok = true;
+
+  // insert
+  else if (s.size() + 1 == t.size())
+    ok = insert(s, t);
+
+  else if (s.size() - 1 == t.size())
+    ok = insert(t, s);
+
+  else if (s.size() == t.size())
+    ok = change(s, t);
+
+  if (ok)
+    std::cout << "Yes" << std::endl;
+  else
+    std::cout << "No" << std::endl;
 
   return 0;
 }
