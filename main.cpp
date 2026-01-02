@@ -1,91 +1,81 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <algorithm>
+#include <queue>
+
 using namespace std;
-#include <numeric>
-
-// Combination  nCr ----------
-template <class T>
-void dfs_combination(vector<T> &arr, int idx, int r, vector<T> &pattern, vector<vector<T>> &result)
-{
-  if (r == 0)
-  {
-    result.push_back(pattern);
-    return;
-  }
-  if ((idx + r) > arr.size())
-  {
-    return;
-  }
-
-  // select
-  pattern.push_back(arr[idx]);
-  dfs_combination(arr, idx + 1, r - 1, pattern, result);
-  pattern.pop_back();
-  // not select
-  dfs_combination(arr, idx + 1, r, pattern, result);
-}
-
-template <class T>
-vector<vector<T>> combination(vector<T> &arr, int r)
-{
-  if (arr.size() < r)
-  {
-    printf("combination ERROR: r is larger than arr.size()\n");
-    exit(1);
-  }
-
-  vector<T> pattern;
-  vector<vector<T>> result;
-  dfs_combination(arr, 0, r, pattern, result);
-  return result;
-}
-// ------------------------------
-
-vector<pair<int, string>> solve(int r, vector<int> const &scores)
-{
-  string alphabets = "ABCDE";
-  vector<int> index = {0, 1, 2, 3, 4};
-
-  vector<pair<int, string>> res;
-
-  vector<vector<int>> comb = combination(index, r);
-  for (const auto vec : comb)
-  {
-    string str = "";
-    int score = 0;
-    for (const auto elem : vec)
-    {
-      str += alphabets[elem];
-      score += scores[elem];
-    }
-    res.push_back({score, str});
-  }
-
-  return res;
-}
 
 int main()
 {
-  vector<int> scores(5);
-  vector<pair<int, string>> res;
+  int H, W, D;
+  cin >> H >> W >> D;
 
-  for (auto &&elem : scores)
-    std::cin >> elem;
+  vector<string> S(H);
+  // 距離を管理する配列。初期値は-1（未訪問）
+  vector<vector<int>> dist(H, vector<int>(W, -1));
+  queue<pair<int, int>> q;
 
-  for (int i = 5; i >= 0; i--)
+  // グリッドの読み込みと加湿器('H')の初期化
+  for (int i = 0; i < H; ++i)
   {
-    auto vec = solve(i, scores);
-    for (const auto p : vec)
-      res.push_back(p);
+    cin >> S[i];
+    for (int j = 0; j < W; ++j)
+    {
+      if (S[i][j] == 'H')
+      {
+        dist[i][j] = 0; // 加湿器の場所は距離0
+        q.push({i, j}); // キューに追加
+      }
+    }
   }
 
-  sort(res.begin(), res.end(), [&](pair<int, string> i, pair<int, string> j) -> bool
-       {
-        if (i.first != j.first) return i.first > j.first;
-        return i.second < j.second; });
+  // 移動方向（上下左右）
+  int dx[4] = {1, -1, 0, 0};
+  int dy[4] = {0, 0, 1, -1};
 
-  for (int i = 0; i < res.size() - 1; i++)
-    std::cout << res[i].second << std::endl;
+  // 多始点BFSの実行
+  while (!q.empty())
+  {
+    auto [r, c] = q.front();
+    q.pop();
+
+    // 現在の距離がDに達しているなら、これ以上拡散しない
+    if (dist[r][c] == D)
+      continue;
+
+    for (int i = 0; i < 4; ++i)
+    {
+      int nr = r + dx[i];
+      int nc = c + dy[i];
+
+      // グリッドの範囲内かチェック
+      if (nr >= 0 && nr < H && nc >= 0 && nc < W)
+      {
+        // 壁ではなく、かつ未訪問（最短距離が更新できる）場合
+        if (S[nr][nc] != '#' && dist[nr][nc] == -1)
+        {
+          dist[nr][nc] = dist[r][c] + 1;
+          q.push({nr, nc});
+        }
+      }
+    }
+  }
+
+  // 加湿されたマスの数をカウント
+  int ans = 0;
+  for (int i = 0; i < H; ++i)
+  {
+    for (int j = 0; j < W; ++j)
+    {
+      // distが-1以外なら到達可能（加湿されている）
+      if (dist[i][j] != -1)
+      {
+        ans++;
+      }
+    }
+  }
+
+  cout << ans << endl;
+
+  return 0;
 }
