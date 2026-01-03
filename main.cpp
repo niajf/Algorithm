@@ -1,81 +1,48 @@
+
 #include <iostream>
 #include <vector>
-#include <string>
-#include <queue>
+#include <algorithm>
 
-using namespace std;
+#define MAX 3e5
 
 int main()
 {
-  int H, W, D;
-  cin >> H >> W >> D;
+  int N, M;
+  std::cin >> N >> M;
 
-  vector<string> S(H);
-  // 距離を管理する配列。初期値は-1（未訪問）
-  vector<vector<int>> dist(H, vector<int>(W, -1));
-  queue<pair<int, int>> q;
-
-  // グリッドの読み込みと加湿器('H')の初期化
-  for (int i = 0; i < H; ++i)
+  std::vector<int> A(N);
+  int max = -1;
+  for (int n = 0; n < N; n++)
   {
-    cin >> S[i];
-    for (int j = 0; j < W; ++j)
-    {
-      if (S[i][j] == 'H')
-      {
-        dist[i][j] = 0; // 加湿器の場所は距離0
-        q.push({i, j}); // キューに追加
-      }
-    }
+    std::cin >> A[n];
+    max = std::max(A[n], max);
   }
 
-  // 移動方向（上下左右）
-  int dx[4] = {1, -1, 0, 0};
-  int dy[4] = {0, 0, 1, -1};
-
-  // 多始点BFSの実行
-  while (!q.empty())
+  std::vector<int> C(2e5, MAX);
+  for (int n = 0; n < N; n++)
   {
-    auto [r, c] = q.front();
-    q.pop();
-
-    // 現在の距離がDに達しているなら、これ以上拡散しない
-    if (dist[r][c] == D)
-      continue;
-
-    for (int i = 0; i < 4; ++i)
-    {
-      int nr = r + dx[i];
-      int nc = c + dy[i];
-
-      // グリッドの範囲内かチェック
-      if (nr >= 0 && nr < H && nc >= 0 && nc < W)
-      {
-        // 壁ではなく、かつ未訪問（最短距離が更新できる）場合
-        if (S[nr][nc] != '#' && dist[nr][nc] == -1)
-        {
-          dist[nr][nc] = dist[r][c] + 1;
-          q.push({nr, nc});
-        }
-      }
-    }
+    if (C[A[n] - 1] == MAX)
+      C[A[n] - 1] = n + 1;
   }
 
-  // 加湿されたマスの数をカウント
-  int ans = 0;
-  for (int i = 0; i < H; ++i)
+  int min = C[0];
+  for (int i = 0; i < C.size(); i++)
   {
-    for (int j = 0; j < W; ++j)
-    {
-      // distが-1以外なら到達可能（加湿されている）
-      if (dist[i][j] != -1)
-      {
-        ans++;
-      }
-    }
+    C[i] = std::min(min, C[i]);
+    min = C[i];
   }
 
-  cout << ans << endl;
+  // for (auto const elem : C)
+  //   std::cout << elem << " ";
+  // std::cout << std::endl;
+
+  for (int m = 0; m < M; m++)
+  {
+    int b;
+    std::cin >> b;
+    int v = (C[b - 1] == MAX) ? -1 : C[b - 1];
+    std::cout << v << std::endl;
+  }
 
   return 0;
 }
