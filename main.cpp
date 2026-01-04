@@ -1,48 +1,44 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
 #include <algorithm>
-
-#define MAX 3e5
+#include <iterator>
 
 int main()
 {
-  int N, M;
-  std::cin >> N >> M;
+  int N;
+  std::cin >> N;
 
-  std::vector<int> A(N);
-  int max = -1;
-  for (int n = 0; n < N; n++)
+  std::vector<int> count(N + 1, 0);
+  std::set<int> s;
+
+  int upper = std::sqrt(N);
+
+  for (int i = 1; i <= upper; i++)
   {
-    std::cin >> A[n];
-    max = std::max(A[n], max);
+    for (int j = i + 1; j <= upper; j++)
+    {
+      int num = i * i + j * j;
+      if (num <= N)
+        count[num]++;
+
+      else
+        break;
+    }
   }
 
-  std::vector<int> C(2e5, MAX);
-  for (int n = 0; n < N; n++)
+  std::vector<int> res;
+  for (int i = 0; i < count.size(); i++)
   {
-    if (C[A[n] - 1] == MAX)
-      C[A[n] - 1] = n + 1;
+    if (count[i] == 1)
+      res.push_back(i);
   }
 
-  int min = C[0];
-  for (int i = 0; i < C.size(); i++)
-  {
-    C[i] = std::min(min, C[i]);
-    min = C[i];
-  }
-
-  // for (auto const elem : C)
-  //   std::cout << elem << " ";
-  // std::cout << std::endl;
-
-  for (int m = 0; m < M; m++)
-  {
-    int b;
-    std::cin >> b;
-    int v = (C[b - 1] == MAX) ? -1 : C[b - 1];
-    std::cout << v << std::endl;
-  }
+  std::cout << res.size() << std::endl;
+  for (auto const elem : res)
+    std::cout << elem << " ";
+  std::cout << std::endl;
 
   return 0;
 }
