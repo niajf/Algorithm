@@ -1,44 +1,60 @@
 
 #include <iostream>
+#include <string>
 #include <vector>
-#include <set>
 #include <algorithm>
-#include <iterator>
 
 int main()
 {
-  int N;
-  std::cin >> N;
+  int N, K;
+  std::cin >> N >> K;
 
-  std::vector<int> count(N + 1, 0);
-  std::set<int> s;
+  std::string data;
+  std::cin >> data;
 
-  int upper = std::sqrt(N);
+  std::vector<int> L;
+  std::vector<int> R;
 
-  for (int i = 1; i <= upper; i++)
+  bool isOne = false;
+  for (int i = 0; i < N; i++)
   {
-    for (int j = i + 1; j <= upper; j++)
+    if (data[i] == '1')
     {
-      int num = i * i + j * j;
-      if (num <= N)
-        count[num]++;
+      if (!isOne)
+      {
+        L.push_back(i);
+        isOne = true;
+      }
+    }
 
-      else
-        break;
+    else
+    {
+      if (isOne)
+      {
+        R.push_back(i - 1);
+        isOne = false;
+      }
     }
   }
 
-  std::vector<int> res;
-  for (int i = 0; i < count.size(); i++)
-  {
-    if (count[i] == 1)
-      res.push_back(i);
-  }
+  if (L.size() != R.size())
+    R.push_back(N - 1);
 
-  std::cout << res.size() << std::endl;
-  for (auto const elem : res)
-    std::cout << elem << " ";
-  std::cout << std::endl;
+  // for (auto const elem : L)
+  //   std::cout << elem << ", ";
+  // std::cout << std::endl;
+
+  // for (auto const elem : R)
+  //   std::cout << elem << ", ";
+  // std::cout << std::endl;
+
+  for (int i = L[K - 1]; i <= R[K - 1]; i++)
+    data[i] = '0';
+
+  for (int i = R[K - 2] + 1; i <= R[K - 2] + 1 + (R[K - 1] - L[K - 1]); i++)
+    data[i] = '1';
+
+  std::cout << data << std::endl;
 
   return 0;
 }
