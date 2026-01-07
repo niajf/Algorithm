@@ -1,60 +1,47 @@
 
 #include <iostream>
-#include <string>
 #include <vector>
 #include <algorithm>
 
+typedef long long int ll;
 int main()
 {
-  int N, K;
-  std::cin >> N >> K;
+  ll N;
+  int M;
+  std::cin >> N >> M;
 
-  std::string data;
-  std::cin >> data;
+  std::vector<std::pair<int, int>> XA(M);
+  std::vector<int> C(M, 0);
 
-  std::vector<int> L;
-  std::vector<int> R;
+  for (int i = 0; i < M; i++)
+    std::cin >> XA[i].first;
 
-  bool isOne = false;
-  for (int i = 0; i < N; i++)
+  for (int i = 0; i < M; i++)
+    std::cin >> XA[i].second;
+
+  std::sort(XA.begin(), XA.end());
+
+  ll ans = 0;
+  ll sum = 0;
+  for (int i = 0; i < M; i++)
   {
-    if (data[i] == '1')
+    if (sum < XA[i].first - 1)
     {
-      if (!isOne)
-      {
-        L.push_back(i);
-        isOne = true;
-      }
+      std::cout << -1 << std::endl;
+      return 0;
     }
 
-    else
-    {
-      if (isOne)
-      {
-        R.push_back(i - 1);
-        isOne = false;
-      }
-    }
+    sum += XA[i].second;
+    ans += XA[i].second * XA[i].first;
   }
 
-  if (L.size() != R.size())
-    R.push_back(N - 1);
-
-  // for (auto const elem : L)
-  //   std::cout << elem << ", ";
-  // std::cout << std::endl;
-
-  // for (auto const elem : R)
-  //   std::cout << elem << ", ";
-  // std::cout << std::endl;
-
-  for (int i = L[K - 1]; i <= R[K - 1]; i++)
-    data[i] = '0';
-
-  for (int i = R[K - 2] + 1; i <= R[K - 2] + 1 + (R[K - 1] - L[K - 1]); i++)
-    data[i] = '1';
-
-  std::cout << data << std::endl;
+  if (sum != N)
+  {
+    std::cout << -1 << std::endl;
+    return 0;
+  }
+  else
+    std::cout << N * (N + 1) / 2 - ans << std::endl;
 
   return 0;
 }
