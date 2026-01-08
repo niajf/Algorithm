@@ -1,47 +1,35 @@
-
 #include <iostream>
+#include <map>
 #include <vector>
-#include <algorithm>
 
-typedef long long int ll;
 int main()
 {
-  ll N;
-  int M;
-  std::cin >> N >> M;
+  int N;
+  std::cin >> N;
 
-  std::vector<std::pair<int, int>> XA(M);
-  std::vector<int> C(M, 0);
+  std::map<int, int> M;
+  std::vector<int> B;
 
-  for (int i = 0; i < M; i++)
-    std::cin >> XA[i].first;
-
-  for (int i = 0; i < M; i++)
-    std::cin >> XA[i].second;
-
-  std::sort(XA.begin(), XA.end());
-
-  ll ans = 0;
-  ll sum = 0;
-  for (int i = 0; i < M; i++)
+  for (int i = 0; i < N; i++)
   {
-    if (sum < XA[i].first - 1)
+    int num;
+    std::cin >> num;
+
+    if (M.find(num) == M.end())
     {
-      std::cout << -1 << std::endl;
-      return 0;
+      B.push_back(-1);
+      M[num] = i;
     }
-
-    sum += XA[i].second;
-    ans += XA[i].second * XA[i].first;
+    else
+    {
+      B.push_back(M[num] + 1);
+      M[num] = i;
+    }
   }
 
-  if (sum != N)
-  {
-    std::cout << -1 << std::endl;
-    return 0;
-  }
-  else
-    std::cout << N * (N + 1) / 2 - ans << std::endl;
+  for (auto const elem : B)
+    std::cout << elem << " ";
+  std::cout << std::endl;
 
   return 0;
 }
