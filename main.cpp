@@ -1,35 +1,39 @@
 #include <iostream>
-#include <map>
 #include <vector>
+#include <map>
+#include <algorithm>
 
 int main()
 {
-  int N;
-  std::cin >> N;
+  unsigned long long N;
+  int M;
 
-  std::map<int, int> M;
-  std::vector<int> B;
+  std::cin >> N >> M;
+  std::map<std::pair<int, int>, int> map;
 
-  for (int i = 0; i < N; i++)
+  std::vector<int> offset_i = {-2, -1, 1, 2, 2, 1, -1, -2};
+  std::vector<int> offset_j = {1, 2, 2, 1, -1, -2, -2, -1};
+
+  for (int m = 0; m < M; m++)
   {
-    int num;
-    std::cin >> num;
+    int i, j;
+    std::cin >> i >> j;
 
-    if (M.find(num) == M.end())
+    map[{i, j}] = 1;
+
+    for (int k = 0; k < 8; k++)
     {
-      B.push_back(-1);
-      M[num] = i;
-    }
-    else
-    {
-      B.push_back(M[num] + 1);
-      M[num] = i;
+      if ((1 <= i + offset_i[k]) && (i + offset_i[k] <= N) && (1 <= j + offset_j[k]) && (j + offset_j[k] <= N))
+        map[{i + offset_i[k], j + offset_j[k]}] = 1;
     }
   }
 
-  for (auto const elem : B)
-    std::cout << elem << " ";
-  std::cout << std::endl;
+  unsigned long long ans = N * N;
+  ans -= map.size();
+
+  // std::cout << map.size() << std::endl;
+  // std::cout << N * N << std::endl;
+  std::cout << ans << std::endl;
 
   return 0;
 }
