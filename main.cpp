@@ -1,39 +1,42 @@
 #include <iostream>
 #include <vector>
-#include <map>
 #include <algorithm>
 
 int main()
 {
-  unsigned long long N;
-  int M;
+  int N;
+  std::cin >> N;
 
-  std::cin >> N >> M;
-  std::map<std::pair<int, int>, int> map;
+  std::vector<int> A(N);
+  std::vector<int> B(N - 1);
 
-  std::vector<int> offset_i = {-2, -1, 1, 2, 2, 1, -1, -2};
-  std::vector<int> offset_j = {1, 2, 2, 1, -1, -2, -2, -1};
+  for (int i = 0; i < N; i++)
+    std::cin >> A[i];
 
-  for (int m = 0; m < M; m++)
+  for (int i = 0; i < N - 1; i++)
+    std::cin >> B[i];
+
+  std::sort(A.rbegin(), A.rend());
+  std::sort(B.begin(), B.end());
+
+  int ans = -1;
+  auto pos = B.end();
+
+  for (auto const elem : A)
   {
-    int i, j;
-    std::cin >> i >> j;
+    auto iter = std::lower_bound(B.begin(), pos, elem);
 
-    map[{i, j}] = 1;
+    if (iter != pos)
+      --pos;
 
-    for (int k = 0; k < 8; k++)
-    {
-      if ((1 <= i + offset_i[k]) && (i + offset_i[k] <= N) && (1 <= j + offset_j[k]) && (j + offset_j[k] <= N))
-        map[{i + offset_i[k], j + offset_j[k]}] = 1;
-    }
+    else
+      ans = elem;
   }
 
-  unsigned long long ans = N * N;
-  ans -= map.size();
-
-  // std::cout << map.size() << std::endl;
-  // std::cout << N * N << std::endl;
-  std::cout << ans << std::endl;
+  if (pos == B.begin())
+    std::cout << ans << std::endl;
+  else
+    std::cout << -1 << std::endl;
 
   return 0;
 }
