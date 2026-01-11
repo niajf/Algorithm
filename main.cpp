@@ -4,39 +4,56 @@
 
 int main()
 {
-  int N;
-  std::cin >> N;
+  int T;
+  std::cin >> T;
 
-  std::vector<int> A(N);
-  std::vector<int> B(N - 1);
-
-  for (int i = 0; i < N; i++)
-    std::cin >> A[i];
-
-  for (int i = 0; i < N - 1; i++)
-    std::cin >> B[i];
-
-  std::sort(A.rbegin(), A.rend());
-  std::sort(B.begin(), B.end());
-
-  int ans = -1;
-  auto pos = B.end();
-
-  for (auto const elem : A)
+  while (T)
   {
-    auto iter = std::lower_bound(B.begin(), pos, elem);
+    int N, W;
+    std::cin >> N >> W;
 
-    if (iter != pos)
-      --pos;
+    std::vector<long long> A(2 * W, 0);
+    for (int i = 0; i < N; i++)
+    {
+      int num;
+      std::cin >> num;
 
-    else
-      ans = elem;
-  }
+      A[i % (2 * W)] += num;
+    }
 
-  if (pos == B.begin())
+    // for (auto const elem : A)
+    //   std::cout << elem << " ";
+    // std::cout << std::endl;
+
+    int s, e;
+    long long ans, sum = 0;
+    s = 1;
+    e = W;
+
+    for (int i = 0; i < W; i++)
+      sum += A[i];
+    ans = sum;
+    // std::cout << sum << " ";
+
+    for (int i = 0; i < 2 * W; i++)
+    {
+
+      sum -= A[s - 1];
+      sum += A[e];
+      // std::cout << sum << " ";
+      ans = std::min(ans, sum);
+
+      s++;
+      e++;
+
+      if (e >= 2 * W)
+        e -= 2 * W;
+    }
+    // std::cout << std::endl;
+
     std::cout << ans << std::endl;
-  else
-    std::cout << -1 << std::endl;
+    T--;
+  }
 
   return 0;
 }
