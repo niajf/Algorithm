@@ -1,32 +1,50 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <string>
 
 int main()
 {
-  int N;
-  std::cin >> N;
+  int N, Q;
+  std::cin >> N >> Q;
 
-  long long am;
-  long long bm;
+  std::string S;
+  std::cin >> S;
 
-  std::cin >> am;
-  for (int i = 0; i < N - 1; i++)
+  int ans = 0;
+
+  for (int i = 0; i < N - 2; i++)
   {
-    long long a;
-    std::cin >> a;
-    am = std::max(a, am);
+    if ((S[i] == 'A') && (S[i + 1] == 'B') && (S[i + 2] == 'C'))
+      ans++;
   }
 
-  std::cin >> bm;
-  for (int i = 0; i < N - 1; i++)
+  for (int q = 0; q < Q; q++)
   {
-    long long b;
-    std::cin >> b;
-    bm = std::max(b, bm);
-  }
+    int p;
+    char c;
+    std::cin >> p >> c;
+    p--;
 
-  std::cout << am + bm << std::endl;
+    int pr = 0, ne = 0;
+
+    for (int i = p - 2; i < p + 3; i++)
+    {
+      if ((S[i] == 'A') && (S[i + 1] == 'B') && (S[i + 2] == 'C'))
+        pr++;
+    }
+
+    S[p] = c;
+
+    for (int i = p - 2; i < p + 3; i++)
+    {
+      if ((S[i] == 'A') && (S[i + 1] == 'B') && (S[i + 2] == 'C'))
+        ne++;
+    }
+
+    ans = ans + (ne - pr);
+    std::cout << ans << std::endl;
+  }
 
   return 0;
 }
