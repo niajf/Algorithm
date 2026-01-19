@@ -1,39 +1,37 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#include <string>
 
 int main()
 {
+  int N;
+  std::cin >> N;
 
-  std::string S, T;
-  std::cin >> S >> T;
+  std::vector<int> A(N);
+  for (int i = 0; i < N; i++)
+    std::cin >> A[i];
 
-  std::vector<std::string> X;
-
-  for (int i = 0; i < S.size(); i++)
+  long long ans = N;
+  int i = 0, j = 1;
+  while (i < N - 1)
   {
-    if (S[i] > T[i])
+    int d = A[i + 1] - A[i];
+    // std::cout << "start= " << i << " d= " << d << " ans= " << ans << std::endl;
+
+    j = i + 1;
+    while (j < N)
     {
-      S[i] = T[i];
-      X.push_back(S);
+      if (A[j] - A[j - 1] == d)
+        ans += j - i;
+      else
+        break;
+
+      j++;
     }
+    i = j - 1;
   }
 
-  for (int i = S.size(); i >= 0; i--)
-  {
-    if (S[i] < T[i])
-    {
-      S[i] = T[i];
-      X.push_back(S);
-    }
-  }
-
-  // std::sort(X.begin(), X.end());
-
-  std::cout << X.size() << std::endl;
-  for (auto const str : X)
-    std::cout << str << std::endl;
+  std::cout << ans << std::endl;
 
   return 0;
 }
