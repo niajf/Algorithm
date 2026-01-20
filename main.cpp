@@ -1,37 +1,28 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 int main()
 {
   int N;
   std::cin >> N;
 
-  std::vector<int> A(N);
-  for (int i = 0; i < N; i++)
-    std::cin >> A[i];
+  std::vector<int> H(N);
+  for (auto &&enemy : H)
+    std::cin >> enemy;
 
-  long long ans = N;
-  int i = 0, j = 1;
-  while (i < N - 1)
+  std::vector<std::vector<int>> mod = {{1, 2, 3, 3}, {1, 2, 2, 2}, {1, 1, 1, 2}};
+  long long T = 0;
+  for (auto const enemy : H)
   {
-    int d = A[i + 1] - A[i];
-    // std::cout << "start= " << i << " d= " << d << " ans= " << ans << std::endl;
+    T += std::floor(enemy / 5) * 3;
 
-    j = i + 1;
-    while (j < N)
-    {
-      if (A[j] - A[j - 1] == d)
-        ans += j - i;
-      else
-        break;
-
-      j++;
-    }
-    i = j - 1;
+    if (enemy % 5 != 0)
+      T += mod[T % 3][enemy % 5 - 1];
   }
 
-  std::cout << ans << std::endl;
+  std::cout << T << std::endl;
 
   return 0;
 }
