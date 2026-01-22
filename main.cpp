@@ -1,52 +1,39 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-#include <cmath>
+#include <set>
 
 int main()
 {
-  int N, K;
-  std::cin >> N >> K;
+  int Q;
+  std::cin >> Q;
 
-  std::vector<int> R(N);
-  for (auto &&elem : R)
-    std::cin >> elem;
-
-  std::vector<std::vector<int>> ans;
-
-  std::vector<int> counter(N, 1);
-  while ((counter.front() <= R.front()))
+  std::vector<int> A(1e6 + 1, 0);
+  std::set<int> S;
+  for (int q = 0; q < Q; q++)
   {
-    // for (auto const elem : counter)
-    //   std::cout << elem << " ";
-    // std::cout << std::endl;
+    int num;
+    std::cin >> num;
 
-    int sum = 0;
-    for (int i = 0; i < N; i++)
-      sum += counter[i];
-
-    if (sum % K == 0)
-      ans.push_back(counter);
-
-    counter[N - 1]++;
-
-    for (int i = N - 1; i >= 0; i--)
+    if (num == 1)
     {
-      if ((counter[i] > R[i]) && (i > 0))
-      {
-        counter[i - 1]++;
-        counter[i] = 1;
-      }
+      int x;
+      std::cin >> x;
+      A[x]++;
+      S.insert(x);
     }
-  }
 
-  std::sort(ans.begin(), ans.end());
+    else if (num == 2)
+    {
+      int x;
+      std::cin >> x;
+      A[x]--;
 
-  for (auto const vec : ans)
-  {
-    for (auto const elem : vec)
-      std::cout << elem << " ";
-    std::cout << std::endl;
+      if (A[x] == 0)
+        S.erase(x);
+    }
+
+    else if (num == 3)
+      std::cout << S.size() << std::endl;
   }
 
   return 0;
