@@ -5,68 +5,28 @@
 
 int main()
 {
-  long long N, M;
-  std::cin >> N >> M;
+  long long N, K, X;
+  std::cin >> N >> K >> X;
+
+  std::vector<long long> A(N);
+  for (auto &&elem : A)
+    std::cin >> elem;
+
+  std::sort(A.rbegin(), A.rend());
 
   long long sum = 0;
-  long long max = -1;
-  std::vector<long long> A(N);
-
-  for (int i = 0; i < N; i++)
+  long long ans = -1;
+  for (long long i = N - K; i < N; i++)
   {
-    long long n;
-    std::cin >> n;
-    sum += n;
-    A[i] = n;
-
-    if (max < n)
-      max = n;
-  }
-
-  if (M >= sum)
-  {
-    std::cout << "infinite" << std::endl;
-    return 0;
-  }
-
-  long start = 1;
-  long end = max;
-  long long x = 0;
-  long long ans = 0;
-
-  while (true)
-  {
-    x = start + (end - start) / 2;
-
-    long long sum = 0;
-    for (auto const elem : A)
+    sum += A[i];
+    if (sum >= X)
     {
-      if (x < elem)
-        sum += x;
-      else
-        sum += elem;
-    }
-
-    if (sum == M)
-    {
-      ans = x;
+      ans = i + 1;
       break;
     }
-
-    else if (sum > M)
-      end = x - 1;
-
-    else
-    {
-      start = x + 1;
-      ans = x;
-    }
-
-    if (start > end)
-      break;
   }
 
-  std::cout << ans << std::endl;
+  std::cout << ans << std ::endl;
 
   return 0;
 }
