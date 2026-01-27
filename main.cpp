@@ -1,41 +1,45 @@
 #include <iostream>
-#include <cmath>
 #include <algorithm>
 #include <vector>
-#include <map>
 
 int main()
 {
-  int N, M;
-  std::cin >> N >> M;
+  long long N, X, Y;
+  std::cin >> N >> X >> Y;
 
-  std::map<int, int> edges;
+  std::vector<long long> A(N);
+  std::vector<long long> B(N);
 
-  for (int i = 1; i <= N; i++)
-    edges[i] = 0;
+  for (auto &&a : A)
+    std::cin >> a;
 
-  for (int i = 0; i < M; i++)
+  for (auto &&b : B)
+    std::cin >> b;
+
+  std::sort(A.rbegin(), A.rend());
+  std::sort(B.rbegin(), B.rend());
+
+  int ans = N;
+  long long a_sum = 0, b_sum = 0;
+  for (int i = 0; i < N; i++)
   {
-    int s, e;
-    std::cin >> s >> e;
+    a_sum += A[i];
+    b_sum += B[i];
 
-    edges[s]++;
-    edges[e]++;
+    if (a_sum > X)
+    {
+      ans = i + 1;
+      break;
+    }
+
+    else if (b_sum > Y)
+    {
+      ans = i + 1;
+      break;
+    }
   }
 
-  // for (auto const elem : edges)
-  //   std::cout << elem.second << " ";
-  // std::cout << std::endl;
-
-  for (int i = 1; i <= N; i++)
-  {
-    long long a = 1;
-    for (int j = 0; j < 3; j++)
-      a *= (N - 1 - edges[i] - j);
-
-    std::cout << a / 6 << " ";
-  }
-  std::cout << std::endl;
+  std::cout << ans << std::endl;
 
   return 0;
 }
