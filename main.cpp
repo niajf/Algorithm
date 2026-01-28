@@ -1,45 +1,34 @@
 #include <iostream>
-#include <algorithm>
-#include <vector>
+#include <string>
+using namespace std;
+
+long long TEN(int x) { return x == 0 ? 1 : TEN(x - 1) * 10; }
 
 int main()
 {
-  long long N, X, Y;
-  std::cin >> N >> X >> Y;
-
-  std::vector<long long> A(N);
-  std::vector<long long> B(N);
-
-  for (auto &&a : A)
-    std::cin >> a;
-
-  for (auto &&b : B)
-    std::cin >> b;
-
-  std::sort(A.rbegin(), A.rend());
-  std::sort(B.rbegin(), B.rend());
-
-  int ans = N;
-  long long a_sum = 0, b_sum = 0;
-  for (int i = 0; i < N; i++)
+  long long N;
+  cin >> N;
+  if (N == 1)
   {
-    a_sum += A[i];
-    b_sum += B[i];
-
-    if (a_sum > X)
+    cout << 0 << endl;
+    return 0;
+  }
+  N--;
+  for (int d = 1;; d++)
+  {
+    int x = (d + 1) / 2;
+    if (N <= 9 * TEN(x - 1))
     {
-      ans = i + 1;
-      break;
+      string S = to_string(TEN(x - 1) + N - 1);
+      S.resize(d, ' ');
+      for (int i = x; i < d; i++)
+        S[i] = S[d - 1 - i];
+      cout << S << endl;
+      return 0;
     }
-
-    else if (b_sum > Y)
+    else
     {
-      ans = i + 1;
-      break;
+      N -= 9 * TEN(x - 1);
     }
   }
-
-  std::cout << ans << std::endl;
-
-  return 0;
 }

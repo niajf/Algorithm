@@ -1,1 +1,2 @@
-g++ -std=c++23 main.cpp -o main
+g++ -std=c++23 main.cpp -o main && echo "Build successed"
+./main
