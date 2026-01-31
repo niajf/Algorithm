@@ -1,64 +1,83 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <queue>
-#include <map>
+#include <algorithm>
 
 using namespace std;
 
 int main()
 {
+  long long N, T;
+  string S;
 
-  int N;
-  std::string S, T;
+  cin >> N >> T >> S;
 
-  std::cin >> N >> S >> T;
+  vector<int> pr, nw;
+  vector<pair<long long, int>> pos(N);
 
-  S += "..";
-  T += "..";
-
-  std::map<std::string, int> dp;
-  std::queue<std::string> que;
-
-  dp[S] = 0;
-  que.push(S);
-
-  while (!que.empty())
+  for (int i = 0; i < N; i++)
   {
-    auto str = que.front();
-    que.pop();
+    long long x;
+    cin >> x;
+    pos[i].first = x;
+    pos[i].second = S[i] - '0';
+  }
 
-    int emp = 0;
-    for (int i = 0; i < S.size(); i++)
+  sort(pos.begin(), pos.end());
+
+  for (auto const elem : pos)
+  {
+    if (elem.second == 1)
+      pr.push_back(0);
+
+    else if (elem.second == 0)
     {
-      if (str[i] == '.')
-      {
-        emp = i;
-        break;
-      }
-    }
-
-    for (int i = 0; i + 1 < S.size(); i++)
-    {
-      if (str[i] == '.' || str[i + 1] == '.')
-        continue;
-
-      std::string str2 = str;
-      std::swap(str2[i], str2[emp]);
-      std::swap(str2[i + 1], str2[emp + 1]);
-      if (!dp.count(str2))
-      {
-        dp[str2] = dp[str] + 1;
-        que.push(str2);
-      }
+      for (auto &&p : pr)
+        p++;
     }
   }
 
-  if (dp.count(T))
-    std::cout << dp[T] << std::endl;
+  for (auto &&elem : pos)
+  {
+    if (elem.second == 0)
+      elem.first -= T;
+    else if (elem.second == 1)
+      elem.first += T;
+  }
 
-  else
-    std::cout << -1 << std::endl;
+  sort(pos.begin(), pos.end());
+
+  for (auto const elem : pos)
+  {
+    if (elem.second == 1)
+      nw.push_back(0);
+
+    else if (elem.second == 0)
+    {
+      for (auto &&p : nw)
+        p++;
+    }
+  }
+
+  // for (auto elem : pos)
+  //   cout << elem.first << " " << elem.second << endl;
+
+  // for (auto const elem : pr)
+  //   cout << elem << " ";
+  // cout << endl;
+
+  // for (auto const elem : nw)
+  //   cout << elem << " ";
+  // cout << endl;
+
+  long long ans = 0;
+  for (int i = 0; i < pr.size(); i++)
+  {
+    ans += pr[i];
+    ans -= nw[i];
+  }
+
+  cout << ans << endl;
 
   return 0;
 }
