@@ -1,35 +1,45 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <utility>
 
 using namespace std;
 
 int main()
 {
-  int T;
-  cin >> T;
+  int N, Q;
+  cin >> N >> Q;
 
-  for (int t = 0; t < T; t++)
+  vector<int> A(N), S(N);
+  for (int i = 0; i < N; i++)
   {
-    int N;
-    cin >> N;
+    cin >> A[i];
+    S[i] = (i > 0) ? (S[i - 1] + A[i]) : A[i];
+  }
 
-    vector<int> R(N), S(N);
-    for (auto &&r : R)
-      cin >> r;
-    copy(R.begin(), R.end(), S.begin());
+  for (int q = 0; q < Q; q++)
+  {
+    int type;
+    cin >> type;
 
-    for (int i = 1; i < N; i++)
-      R[i] = min(R[i], R[i - 1] + 1);
+    if (type == 1)
+    {
+      int pos;
+      cin >> pos;
+      S[pos - 1] = S[pos - 1] - (A[pos - 1] - A[pos]);
+      swap(A[pos - 1], A[pos]);
+    }
 
-    for (int i = N - 2; i >= 0; i--)
-      R[i] = min(R[i], R[i + 1] + 1);
+    else if (type == 2)
+    {
+      int s, e;
+      cin >> s >> e;
 
-    long long ans = 0;
-    for (int i = 0; i < N; i++)
-      ans += S[i] - R[i];
+      cout << ((s > 1) ? (S[e - 1] - S[s - 2]) : (S[e - 1])) << endl;
+    }
 
-    cout << ans << endl;
+    // for (auto elem : S)
+    //   cout << elem << " ";
+    // cout << endl;
   }
 
   return 0;
