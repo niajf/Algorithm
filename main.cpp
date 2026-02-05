@@ -1,69 +1,69 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <map>
 
 using namespace std;
 
-/**
- * f(M, A): M 以下の整数のうち、リスト A に含まれないものの個数を返す
- * リスト A はあらかじめ昇順にソートされている必要がある
- */
-long long f(long long M, const vector<long long> &A)
-{
-  // std::upper_bound で M 以下の要素数をカウント
-  long long count_in_A = upper_bound(A.begin(), A.end(), M) - A.begin();
-  return M - count_in_A;
-}
-
 int main()
 {
-  // 高速入出力の設定
-  ios::sync_with_stdio(false);
-  cin.tie(nullptr);
+  // 高速化のおまじない
+  ios_base::sync_with_stdio(false);
+  cin.tie(NULL);
 
-  int N, Q;
-  if (!(cin >> N >> Q))
+  int N;
+  if (!(cin >> N))
     return 0;
 
   vector<long long> A(N);
+  // 右側にある数の出現回数を管理するマップ
+  map<long long, int> right_cnt;
+  // 左側にある数の出現回数を管理するマップ
+  map<long long, int> left_cnt;
+
+  // 入力の受け取りと初期化（最初はすべて右側にあるとみなす）
   for (int i = 0; i < N; ++i)
   {
     cin >> A[i];
+    right_cnt[A[i]]++;
   }
 
-  // 二分探索のために昇順ソート
-  sort(A.begin(), A.end());
+  long long ans = 0;
 
-  for (int j = 0; j < Q; ++j)
+  // 数列を左から走査し、現在の A[j] を「比率5」の真ん中の値として固定する
+  for (int j = 0; j < N; ++j)
   {
-    long long X, Y;
-    cin >> X >> Y;
+    long long val_mid = A[j];
 
-    // X-1 以下に含まれない数がいくつあるか
-    long long offset = f(X - 1, A);
-    // 全体として小さい方から「offset + Y」番目の含まれない数を探す
-    long long target_rank = offset + Y;
+    // 現在地 j の要素は右側候補から除外
+    right_cnt[val_mid]--;
 
-    // 二分探索の範囲設定
-    // X, Y が最大 10^9 なので、答えは最大 2*10^9 程度になる
-    long long low = 1, high = 2000000000LL;
-    long long ans = high;
-
-    while (low <= high)
+    // 5で割り切れる場合のみ判定を行う
+    if (val_mid % 5 == 0)
     {
-      long long mid = low + (high - low) / 2;
-      if (f(mid, A) >= target_rank)
-      {
-        ans = mid;
-        high = mid - 1;
-      }
-      else
-      {
-        low = mid + 1;
-      }
+      long long base = val_mid / 5;
+      long long val_7 = base * 7; // 比率7の値 (A_i)
+      long long val_3 = base * 3; // 比率3の値 (A_k)
+
+      // マップは存在しないキーにアクセスすると0を返すため、そのまま計算可能
+
+      // パターン1: j が一番右にある場合 (i < j, k < j)
+      // A_i, A_k 共に左側にある個数を掛ける
+      long long l7 = left_cnt[val_7];
+      long long l3 = left_cnt[val_3];
+      ans += l7 * l3;
+
+      // パターン2: j が一番左にある場合 (j < i, j < k)
+      // A_i, A_k 共に右側にある個数を掛ける
+      long long r7 = right_cnt[val_7];
+      long long r3 = right_cnt[val_3];
+      ans += r7 * r3;
     }
-    cout << ans << "\n";
+
+    // 次のループのために、現在の要素を左側のカウントに加える
+    left_cnt[val_mid]++;
   }
+
+  cout << ans << endl;
 
   return 0;
 }
