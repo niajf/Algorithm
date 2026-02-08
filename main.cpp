@@ -1,31 +1,54 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
+typedef long long ll;
+
+const ll MOD = 998244353;
 
 int main()
 {
-  int N = 5;
+  int N, M;
+  cin >> N >> M;
 
-  vector<pair<int, int>> items = {{120, 8}, {150, 10}, {140, 7}, {110, 6}, {100, 7}};
-  vector<vector<int>> dp(N + 1, vector<int>(30 + 1));
+  vector<ll> A(N), B(M), C(M + 1);
 
-  for (int i = 0; i < dp[0].size(); i++)
-    dp[0][i] = 0;
+  for (auto &&a : A)
+    cin >> a;
 
-  for (int i = 0; i < N; ++i)
+  ll b_sum = 0;
+  for (auto &&b : B)
   {
-    for (int j = 0; j <= 30; ++j)
-    {
-      if (j >= items[i].second)
-        dp[i + 1][j] = max(dp[i][j - items[i].second] + items[i].first, dp[i][j]);
-      else
-        dp[i + 1][j] = dp[i][j];
-    }
+    cin >> b;
+    b_sum += b;
   }
 
-  cout << dp[N][30] << endl;
+  sort(B.begin(), B.end());
+
+  ll sum = 0;
+  C[0] = -b_sum;
+  for (int i = 0; i < M; i++)
+  {
+    sum += B[M - i - 1];
+    C[i + 1] = -b_sum + 2 * sum;
+  }
+
+  ll ans = 0;
+  for (auto const a : A)
+  {
+    // 自身より大きいbの数
+    ll cnt = 0;
+    auto itr = upper_bound(B.begin(), B.end(), a);
+    cnt = B.end() - itr;
+    ll term1 = (a % MOD) * ((M - 2 * cnt) % MOD) % MOD;
+    ll term2 = C[cnt] % MOD;
+    ans = (ans + term1 + term2) % MOD;
+  }
+
+  ans = (ans + MOD) % MOD;
+  cout << ans << endl;
 
   return 0;
 }
