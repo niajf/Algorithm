@@ -1,68 +1,106 @@
 #include <iostream>
 #include <vector>
-#include <queue>
-#include <set>
-#include <map>
+
+const int MAX = 2000;
 
 using namespace std;
 int main()
 {
-  int N, M;
-  cin >> N >> M;
+  int N;
+  cin >> N;
 
-  map<int, vector<int>> edges;
-  for (int i = 0; i < M; i++)
+  vector<vector<int>> clouds(N, vector<int>(4, 0));
+  for (int i = 0; i < N; ++i)
   {
-    int u, v;
-    cin >> u >> v;
-
-    if (edges.count(v))
-      edges[v].push_back(u);
-    else
-      edges[v] = {u};
+    for (int j = 0; j < 4; ++j)
+      cin >> clouds[i][j];
   }
 
-  int Q;
-  cin >> Q;
+  vector<vector<int>> table(MAX + 1, vector<int>(MAX + 1, 0));
+  vector<vector<int>> count(MAX + 1, vector<int>(MAX + 1, 0));
 
-  vector<int> visited(N + 1, 0);
-  for (int i = 0; i < Q; i++)
+  for (int i = 0; i < N; ++i)
   {
-    int type, node;
-    cin >> type >> node;
+    ++table[clouds[i][0] - 1][clouds[i][2] - 1];
+    --table[clouds[i][0] - 1][clouds[i][3]];
+    --table[clouds[i][1]][clouds[i][2] - 1];
+    ++table[clouds[i][1]][clouds[i][3]];
+  }
 
-    if (type == 1)
+  for (int c = 0; c < MAX; ++c)
+  {
+    for (int r = 1; r < MAX; ++r)
     {
-      if (!visited[node])
-      {
-        queue<int> que;
-        que.push(node);
-        visited[node] = 1;
-
-        while (!que.empty())
-        {
-          int n = que.front();
-          que.pop();
-
-          for (auto const e : edges[n])
-          {
-            if (!visited[e])
-            {
-              visited[e] = 1;
-              que.push(e);
-            }
-          }
-        }
-      }
+      table[c][r] += table[c][r - 1];
     }
+  }
 
-    else if (type == 2)
+  int sum = 0;
+  for (int r = 0; r < MAX; ++r)
+  {
+    if (table[0][r] > 0)
+      ++sum;
+  }
+
+  for (int c = 1; c < MAX; ++c)
+  {
+    for (int r = 0; r < MAX; ++r)
     {
-      if (visited[node])
-        cout << "Yes" << endl;
+      table[c][r] += table[c - 1][r];
+      if (table[c][r] > 0)
+        ++sum;
+    }
+  }
+
+  for (int c = 0; c < MAX; ++c)
+  {
+    for (int r = 0; r < MAX; ++r)
+    {
+      if (table[c][r] == 1)
+        count[c + 1][r + 1] = 1;
       else
-        cout << "No" << endl;
+        count[c + 1][r + 1] = 0;
     }
+  }
+
+  for (int c = 0; c <= MAX; ++c)
+  {
+    for (int r = 1; r <= MAX; ++r)
+    {
+      count[c][r] += count[c][r - 1];
+    }
+  }
+
+  for (int c = 1; c <= MAX; ++c)
+  {
+    for (int r = 0; r <= MAX; ++r)
+    {
+      count[c][r] += count[c - 1][r];
+    }
+  }
+
+  // for (int c = 0; c < 10; ++c)
+  // {
+  //   for (int r = 0; r < 10; ++r)
+  //   {
+  //     cout << count[c][r] << " ";
+  //   }
+  //   cout << endl;
+  // }
+
+  // cout << sum << endl;
+
+  for (int i = 0; i < N; ++i)
+  {
+    int c1, c2, r1, r2;
+    c1 = clouds[i][0];
+    c2 = clouds[i][1];
+    r1 = clouds[i][2];
+    r2 = clouds[i][3];
+
+    int can_remove = count[c2][r2] - count[c2][r1 - 1] - count[c1 - 1][r2] + count[c1 - 1][r1 - 1];
+    // cout << count[c2][r1] << " " << count[c2][r1 - 1] << " " << count[c1 - 1][r2] << " " << count[c1 - 1][r1 - 1] << endl;
+    cout << MAX * MAX - (sum - can_remove) << endl;
   }
 
   return 0;
