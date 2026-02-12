@@ -1,107 +1,72 @@
 #include <iostream>
 #include <vector>
-
-const int MAX = 2000;
+#include <string>
+#include <map>
 
 using namespace std;
+
+// 桁数を取得する関数
+int GetDigit(long long num)
+{
+  return to_string(num).length();
+}
+
 int main()
 {
-  int N;
-  cin >> N;
+  long long N, M;
+  cin >> N >> M;
 
-  vector<vector<int>> clouds(N, vector<int>(4, 0));
-  for (int i = 0; i < N; ++i)
+  vector<long long> A(N);
+  // counts[len][remainder] = 個数
+  // 桁数(len)ごとに、あまり(remainder)がいくつの数あるかを管理
+  vector<map<int, int>> counts(11);
+
+  // 10のべき乗 mod M を事前計算
+  vector<long long> pow10(11);
+  long long p = 1;
+  for (int i = 0; i <= 10; i++)
   {
-    for (int j = 0; j < 4; ++j)
-      cin >> clouds[i][j];
+    pow10[i] = p % M;
+    p = (p * 10) % M;
   }
 
-  vector<vector<int>> table(MAX + 1, vector<int>(MAX + 1, 0));
-  vector<vector<int>> count(MAX + 1, vector<int>(MAX + 1, 0));
-
-  for (int i = 0; i < N; ++i)
+  // データの読み込みと分類
+  for (int i = 0; i < N; i++)
   {
-    ++table[clouds[i][0] - 1][clouds[i][2] - 1];
-    --table[clouds[i][0] - 1][clouds[i][3]];
-    --table[clouds[i][1]][clouds[i][2] - 1];
-    ++table[clouds[i][1]][clouds[i][3]];
+    cin >> A[i];
+    int d = GetDigit(A[i]);
+    int r = A[i] % M;
+    // 「桁数d」で「あまりがr」である数の個数をカウント
+    counts[d][r]++;
   }
 
-  for (int c = 0; c < MAX; ++c)
+  long long ans = 0;
+
+  // A[i] を「前の数」としたとき、合う「後ろの数」を探す
+  for (int i = 0; i < N; i++)
   {
-    for (int r = 1; r < MAX; ++r)
+    long long current_rem = A[i] % M;
+
+    // 後ろに来る数の桁数 L (1桁〜10桁) を全探索
+    for (int L = 1; L <= 10; L++)
     {
-      table[c][r] += table[c][r - 1];
+      // 条件: (A[i] * 10^L + A[j]) % M == 0
+      // 変形: A[j] % M == -(A[i] * 10^L) % M
+
+      // A[i] を L桁シフトした値のあまり
+      long long term1 = (current_rem * pow10[L]) % M;
+
+      // ペア成立に必要な A[j] のあまりを計算
+      long long needed = (M - term1) % M;
+
+      // 桁数が L で、あまりが needed になる数が存在すれば加算
+      if (counts[L].count(needed))
+      {
+        ans += counts[L][needed];
+      }
     }
   }
 
-  int sum = 0;
-  for (int r = 0; r < MAX; ++r)
-  {
-    if (table[0][r] > 0)
-      ++sum;
-  }
-
-  for (int c = 1; c < MAX; ++c)
-  {
-    for (int r = 0; r < MAX; ++r)
-    {
-      table[c][r] += table[c - 1][r];
-      if (table[c][r] > 0)
-        ++sum;
-    }
-  }
-
-  for (int c = 0; c < MAX; ++c)
-  {
-    for (int r = 0; r < MAX; ++r)
-    {
-      if (table[c][r] == 1)
-        count[c + 1][r + 1] = 1;
-      else
-        count[c + 1][r + 1] = 0;
-    }
-  }
-
-  for (int c = 0; c <= MAX; ++c)
-  {
-    for (int r = 1; r <= MAX; ++r)
-    {
-      count[c][r] += count[c][r - 1];
-    }
-  }
-
-  for (int c = 1; c <= MAX; ++c)
-  {
-    for (int r = 0; r <= MAX; ++r)
-    {
-      count[c][r] += count[c - 1][r];
-    }
-  }
-
-  // for (int c = 0; c < 10; ++c)
-  // {
-  //   for (int r = 0; r < 10; ++r)
-  //   {
-  //     cout << count[c][r] << " ";
-  //   }
-  //   cout << endl;
-  // }
-
-  // cout << sum << endl;
-
-  for (int i = 0; i < N; ++i)
-  {
-    int c1, c2, r1, r2;
-    c1 = clouds[i][0];
-    c2 = clouds[i][1];
-    r1 = clouds[i][2];
-    r2 = clouds[i][3];
-
-    int can_remove = count[c2][r2] - count[c2][r1 - 1] - count[c1 - 1][r2] + count[c1 - 1][r1 - 1];
-    // cout << count[c2][r1] << " " << count[c2][r1 - 1] << " " << count[c1 - 1][r2] << " " << count[c1 - 1][r1 - 1] << endl;
-    cout << MAX * MAX - (sum - can_remove) << endl;
-  }
-
+  cout << ans << endl;
   return 0;
 }
