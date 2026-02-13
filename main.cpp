@@ -1,72 +1,181 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <map>
+#include <algorithm>
+#include <numeric>
 
 using namespace std;
 
-// 桁数を取得する関数
-int GetDigit(long long num)
+// 矩形を表す構造体（閉区間 [xl, xr] x [yl, yr]）
+struct Rect
 {
-  return to_string(num).length();
-}
+  long long xl, xr; // 行 (Row) 範囲
+  long long yl, yr; // 列 (Column) 範囲
+
+  long long area() const
+  {
+    return (xr - xl + 1) * (yr - yl + 1);
+  }
+};
+
+// Union-Find (DSU) の簡易実装
+struct DSU
+{
+  vector<int> parent;
+  DSU(int n) : parent(n)
+  {
+    iota(parent.begin(), parent.end(), 0);
+  }
+  int find(int x)
+  {
+    if (parent[x] == x)
+      return x;
+    return parent[x] = find(parent[x]);
+  }
+  void unite(int x, int y)
+  {
+    int rootX = find(x);
+    int rootY = find(y);
+    if (rootX != rootY)
+      parent[rootX] = rootY;
+  }
+};
 
 int main()
 {
-  long long N, M;
-  cin >> N >> M;
+  int N;
+  long long H, W;
+  if (!(cin >> N >> H >> W))
+    return 0;
 
-  vector<long long> A(N);
-  // counts[len][remainder] = 個数
-  // 桁数(len)ごとに、あまり(remainder)がいくつの数あるかを管理
-  vector<map<int, int>> counts(11);
-
-  // 10のべき乗 mod M を事前計算
-  vector<long long> pow10(11);
-  long long p = 1;
-  for (int i = 0; i <= 10; i++)
+  vector<string> C(N);
+  vector<long long> A(N), B(N);
+  for (int i = 0; i < N; ++i)
   {
-    pow10[i] = p % M;
-    p = (p * 10) % M;
+    cin >> C[i] >> A[i] >> B[i];
   }
 
-  // データの読み込みと分類
-  for (int i = 0; i < N; i++)
+  // 初期状態は1枚の巨大な矩形
+  vector<Rect> rects;
+  rects.push_back({0, H - 1, 0, W - 1});
+
+  for (int i = 0; i < N; ++i)
   {
-    cin >> A[i];
-    int d = GetDigit(A[i]);
-    int r = A[i] % M;
-    // 「桁数d」で「あまりがr」である数の個数をカウント
-    counts[d][r]++;
-  }
+    vector<Rect> next_rects;
+    long long split_pos = A[i];
+    long long shift = B[i];
 
-  long long ans = 0;
-
-  // A[i] を「前の数」としたとき、合う「後ろの数」を探す
-  for (int i = 0; i < N; i++)
-  {
-    long long current_rem = A[i] % M;
-
-    // 後ろに来る数の桁数 L (1桁〜10桁) を全探索
-    for (int L = 1; L <= 10; L++)
+    if (C[i] == "X")
     {
-      // 条件: (A[i] * 10^L + A[j]) % M == 0
-      // 変形: A[j] % M == -(A[i] * 10^L) % M
-
-      // A[i] を L桁シフトした値のあまり
-      long long term1 = (current_rem * pow10[L]) % M;
-
-      // ペア成立に必要な A[j] のあまりを計算
-      long long needed = (M - term1) % M;
-
-      // 桁数が L で、あまりが needed になる数が存在すれば加算
-      if (counts[L].count(needed))
+      // 行(x)で分割し、列(y)をずらす
+      for (const auto &r : rects)
       {
-        ans += counts[L][needed];
+        // 1. 分割線より完全に上 (x < A) -> yを -B ずらす
+        if (r.xr < split_pos)
+        {
+          next_rects.push_back({r.xl, r.xr, r.yl - shift, r.yr - shift});
+        }
+        // 2. 分割線より完全に下 (x >= A) -> yを +B ずらす
+        else if (r.xl >= split_pos)
+        {
+          next_rects.push_back({r.xl, r.xr, r.yl + shift, r.yr + shift});
+        }
+        // 3. 分割線をまたぐ -> 上下2つに分割してそれぞれずらす
+        else
+        {
+          // 上側 (x < A)
+          next_rects.push_back({r.xl, split_pos - 1, r.yl - shift, r.yr - shift});
+          // 下側 (x >= A)
+          next_rects.push_back({split_pos, r.xr, r.yl + shift, r.yr + shift});
+        }
+      }
+    }
+    else
+    { // C[i] == "Y"
+      // 列(y)で分割し、行(x)をずらす
+      for (const auto &r : rects)
+      {
+        // 1. 分割線より完全に左 (y < A) -> xを -B ずらす
+        if (r.yr < split_pos)
+        {
+          next_rects.push_back({r.xl - shift, r.xr - shift, r.yl, r.yr});
+        }
+        // 2. 分割線より完全に右 (y >= A) -> xを +B ずらす
+        else if (r.yl >= split_pos)
+        {
+          next_rects.push_back({r.xl + shift, r.xr + shift, r.yl, r.yr});
+        }
+        // 3. 分割線をまたぐ -> 左右2つに分割してそれぞれずらす
+        else
+        {
+          // 左側 (y < A)
+          next_rects.push_back({r.xl - shift, r.xr - shift, r.yl, split_pos - 1});
+          // 右側 (y >= A)
+          next_rects.push_back({r.xl + shift, r.xr + shift, split_pos, r.yr});
+        }
+      }
+    }
+    rects = next_rects;
+  }
+
+  // 連結成分の判定
+  int M = rects.size();
+  DSU dsu(M);
+
+  for (int i = 0; i < M; ++i)
+  {
+    for (int j = i + 1; j < M; ++j)
+    {
+      const Rect &s = rects[i];
+      const Rect &t = rects[j];
+
+      // X方向の接触判定 (Gapが0であることの判定)
+      // sの右端+1がtの左端、またはtの右端+1がsの左端
+      bool x_touch_exact = (s.xr + 1 == t.xl) || (t.xr + 1 == s.xl);
+      // 単なる区間の重なり（接触含む）
+      bool x_overlap = !(s.xr + 1 <= t.xl) && !(t.xr + 1 <= s.xl);
+
+      // Y方向の接触判定
+      bool y_touch_exact = (s.yr + 1 == t.yl) || (t.yr + 1 == s.yl);
+      bool y_overlap = !(s.yr + 1 <= t.yl) && !(t.yr + 1 <= s.yl);
+
+      // 連結条件:
+      // (行がぴったりくっついていて、列が重なっている) OR (列がぴったりくっついていて、行が重なっている)
+      if ((x_touch_exact && y_overlap) || (y_touch_exact && x_overlap))
+      {
+        dsu.unite(i, j);
       }
     }
   }
 
-  cout << ans << endl;
+  // 連結成分ごとの面積集計
+  // グループID -> 面積合計
+  // (グループIDは 0~M-1 の範囲になるため vector で管理可能)
+  vector<long long> group_sizes(M, 0);
+  for (int i = 0; i < M; ++i)
+  {
+    group_sizes[dsu.find(i)] += rects[i].area();
+  }
+
+  // 面積が0より大きいものを抽出してソート
+  vector<long long> results;
+  for (int i = 0; i < M; ++i)
+  {
+    // 親(代表元)の場所にだけ合計値が入っている
+    if (dsu.parent[i] == i && group_sizes[i] > 0)
+    {
+      results.push_back(group_sizes[i]);
+    }
+  }
+  sort(results.begin(), results.end());
+
+  // 出力
+  cout << results.size() << "\n";
+  for (size_t i = 0; i < results.size(); ++i)
+  {
+    cout << results[i] << (i == results.size() - 1 ? "" : " ");
+  }
+  cout << "\n";
+
   return 0;
 }
