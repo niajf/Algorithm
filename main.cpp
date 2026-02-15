@@ -1,56 +1,67 @@
 #include <iostream>
-#include <vector>
+#include <map>
 #include <algorithm>
+#include <iterator>
 
 using namespace std;
 using ll = long long;
 
 int main()
 {
-  ll N;
+  int N;
   cin >> N;
 
-  vector<ll> W(N);
-  vector<ll> H(N);
-  vector<ll> B(N);
+  map<int, ll> M;
+  M[0] = 0;
 
-  ll sum_weight = 0;
-  ll sum_body = 0;
+  ll total_length = 0;
   for (int i = 0; i < N; i++)
   {
-    cin >> W[i] >> H[i] >> B[i];
-    sum_weight += W[i];
-    sum_body += B[i];
-  }
+    int x;
+    cin >> x;
 
-  ll size = sum_weight / 2;
-  // cout << size << endl;
-  vector<vector<ll>> dp(N + 1, vector<ll>(size + 1));
+    M[x] = 0;
+    auto iter = M.find(x);
+    auto prev_it = prev(iter);
+    auto next_it = next(iter);
 
-  for (ll i = 0; i < dp[0].size(); i++)
-    dp[0][i] = sum_body;
+    // 初期化
+    int prev_length, next_length;
+    prev_length = iter->first - prev_it->first;
 
-  for (ll i = 0; i < N; ++i)
-  {
-    for (ll j = 0; j <= size; ++j)
+    next_length = 1e9;
+    if (next_it != M.end())
+      next_length = next_it->first - iter->first;
+
+    // cout << "prev length : " << prev_length << endl;
+    // cout << "next length : " << next_length << endl;
+
+    // 距離の計算
+    iter->second = min(prev_length, next_length);
+    total_length += iter->second;
+
+    // 距離の更新
+    if (i == 0)
     {
-      if (j >= W[i])
-        dp[i + 1][j] = max(dp[i][j - W[i]] - B[i] + H[i], dp[i][j]);
-      else
-        dp[i + 1][j] = dp[i][j];
+      prev_it->second = prev_length;
+      total_length += prev_it->second;
     }
+    else if (prev_it->second > prev_length)
+    {
+      total_length -= prev_it->second;
+      prev_it->second = prev_length;
+      total_length += prev_it->second;
+    }
+
+    if ((next_it != M.end()) && (next_it->second > next_length))
+    {
+      total_length -= next_it->second;
+      next_it->second = next_length;
+      total_length += next_it->second;
+    }
+
+    cout << total_length << endl;
   }
-
-  // for (int i = 0; i <= N; i++)
-  // {
-  //   for (int j = 0; j < dp[i].size(); j++)
-  //   {
-  //     cout << dp[i][j] << " ";
-  //   }
-  //   cout << endl;
-  // }
-
-  cout << dp[N][size] << endl;
 
   return 0;
 }
