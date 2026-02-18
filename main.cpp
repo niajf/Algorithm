@@ -1,59 +1,76 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <string>
-#include <cmath>
 
 using namespace std;
-typedef long long int ll;
-
-ll f(ll a, ll b)
-{
-  for (int i = 0; i < to_string(b).size(); i++)
-    a *= 10;
-
-  return a + b;
-}
-
-ll g(ll x)
-{
-  ll y = sqrt(x);
-  while (y * y > x)
-    y--;
-  while ((y + 1) * (y + 1) <= x)
-    y++;
-  return y;
-}
 
 int main()
 {
   int T;
   cin >> T;
-
-  for (int t = 0; t < T; t++)
+  while (T--)
   {
-    ll ans = 0;
-    ll C, D;
-    cin >> C >> D;
+    int N, M, K;
+    string S;
+    cin >> N >> M >> K >> S;
 
-    ll xmin = 1, xmax = 9, cshift = 10;
-    while (xmin <= C + D)
+    vector<vector<int>> G(N, vector<int>());
+    for (int m = 0; m < M; m++)
     {
-      ll l = max(xmin, C + 1);
-      ll r = min(xmax, C + D);
-      if (l <= r)
-      {
-        ll vl = C * cshift + l;
-        ll vr = C * cshift + r;
-        ans += (g(vr) - g(vl - 1));
-      }
-      xmin = xmin * 10;
-      xmax = (xmax + 1) * 10 - 1;
-      cshift *= 10;
+      int u, v;
+      cin >> u >> v;
+      G[u - 1].push_back(v - 1);
     }
 
-    cout << ans << endl;
-  }
+    vector<bool> dp(N);
+    for (int i = 0; i < N; i++)
+    {
+      if (S[i] == 'A')
+        dp[i] = true;
+      else
+        dp[i] = false;
+    }
 
-  return 0;
+    for (int k = 0; k < K; k++)
+    {
+      // for (int i = 0; i < N; i++)
+      //   cout << dp[i] << " ";
+      // cout << "\n";
+
+      {
+        vector<bool> ep(N, true);
+        for (int i = 0; i < N; i++)
+        {
+          for (auto j : G[i])
+          {
+            if (!dp[j])
+              ep[i] = false;
+          }
+        }
+        copy(ep.begin(), ep.end(), dp.begin());
+      }
+
+      // for (int i = 0; i < N; i++)
+      //   cout << dp[i] << " ";
+      // cout << "\n";
+      {
+        vector<bool> ep(N, false);
+        for (int i = 0; i < N; i++)
+        {
+          for (auto j : G[i])
+          {
+            if (dp[j])
+              ep[i] = true;
+          }
+        }
+        copy(ep.begin(), ep.end(), dp.begin());
+      }
+    }
+
+    // for (int i = 0; i < N; i++)
+    //   cout << dp[i] << " ";
+    // cout << "\n";
+
+    cout << ((dp[0]) ? ("Alice") : ("Bob")) << "\n";
+  }
 }
