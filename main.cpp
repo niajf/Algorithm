@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <string>
 #include <algorithm>
 
 using namespace std;
@@ -8,69 +9,75 @@ int main()
 {
   int T;
   cin >> T;
+
   while (T--)
   {
-    int N, M, K;
+    int N;
     string S;
-    cin >> N >> M >> K >> S;
+    cin >> N >> S;
 
-    vector<vector<int>> G(N, vector<int>());
-    for (int m = 0; m < M; m++)
-    {
-      int u, v;
-      cin >> u >> v;
-      G[u - 1].push_back(v - 1);
-    }
+    int max0 = 0;
+    int max1 = 0;
+    int cont0 = 0;
+    int cont1 = 0;
+    int r0 = 0, r1 = 0;
 
-    vector<bool> dp(N);
     for (int i = 0; i < N; i++)
     {
-      if (S[i] == 'A')
-        dp[i] = true;
-      else
-        dp[i] = false;
+      if (S[i] == '0')
+      {
+        if (max1 < cont1)
+        {
+          r1 = i;
+          max1 = cont1;
+        }
+        cont1 = 0;
+        cont0++;
+      }
+      else if (S[i] == '1')
+      {
+        if (max0 < cont0)
+        {
+          r0 = i;
+          max0 = cont0;
+        }
+        cont0 = 0;
+        cont1++;
+      }
     }
 
-    for (int k = 0; k < K; k++)
+    if (max0 < cont0)
     {
-      // for (int i = 0; i < N; i++)
-      //   cout << dp[i] << " ";
-      // cout << "\n";
+      max0 = cont0;
+      r0 = N;
+    }
+    if (max1 < cont1)
+    {
+      max1 = cont1;
+      r1 = N;
+    }
 
+    int ans0 = 0;
+    int ans1 = 0;
+    for (int i = 0; i < N; i++)
+    {
+      if (((r0 - max0 > i) || (i >= r0)))
       {
-        vector<bool> ep(N, true);
-        for (int i = 0; i < N; i++)
-        {
-          for (auto j : G[i])
-          {
-            if (!dp[j])
-              ep[i] = false;
-          }
-        }
-        copy(ep.begin(), ep.end(), dp.begin());
+        if (S[i] == '0')
+          ans0 += 2;
+        else
+          ans0 += 1;
       }
 
-      // for (int i = 0; i < N; i++)
-      //   cout << dp[i] << " ";
-      // cout << "\n";
+      if (((r1 - max1 > i) || (i >= r1)))
       {
-        vector<bool> ep(N, false);
-        for (int i = 0; i < N; i++)
-        {
-          for (auto j : G[i])
-          {
-            if (dp[j])
-              ep[i] = true;
-          }
-        }
-        copy(ep.begin(), ep.end(), dp.begin());
+        if (S[i] == '1')
+          ans1 += 2;
+        else
+          ans1 += 1;
       }
     }
 
-    // for (int i = 0; i < N; i++)
-    //   cout << dp[i] << " ";
-    // cout << "\n";
-
-    cout << ((dp[0]) ? ("Alice") : ("Bob")) << "\n";
+    cout << min(ans0, ans1) << "\n";
   }
 }
