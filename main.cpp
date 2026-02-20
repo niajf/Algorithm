@@ -1,83 +1,88 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <algorithm>
+#include <map>
+#include <set>
 
 using namespace std;
+typedef long long ll;
+
+int H, W;
+
+int count(pair<int, int> pos, set<pair<int, int>> &aleady)
+{
+  vector<int> colMat = {-1, 0, 1, 0};
+  vector<int> rowMat = {0, 1, 0, -1};
+
+  int cnt = 0;
+  for (int i = 0; i < 4; i++)
+  {
+    if ((0 <= pos.first + colMat[i]) && (pos.first + colMat[i] < H) && (0 <= pos.second + rowMat[i]) && (pos.second + rowMat[i] < W))
+    {
+      if (aleady.count({pos.first + colMat[i], pos.second + rowMat[i]}))
+        cnt++;
+    }
+  }
+
+  return cnt;
+}
 
 int main()
 {
-  int T;
-  cin >> T;
+  cin >> H >> W;
 
-  while (T--)
+  vector<pair<int, int>> initialPos;
+  set<pair<int, int>> aleadyPos;
+
+  vector<vector<char>> table(H, vector<char>(W));
+  for (int i = 0; i < H; i++)
   {
-    int N;
-    string S;
-    cin >> N >> S;
-
-    int max0 = 0;
-    int max1 = 0;
-    int cont0 = 0;
-    int cont1 = 0;
-    int r0 = 0, r1 = 0;
-
-    for (int i = 0; i < N; i++)
+    for (int j = 0; j < W; j++)
     {
-      if (S[i] == '0')
+      cin >> table[i][j];
+      if (table[i][j] == '#')
       {
-        if (max1 < cont1)
-        {
-          r1 = i;
-          max1 = cont1;
-        }
-        cont1 = 0;
-        cont0++;
-      }
-      else if (S[i] == '1')
-      {
-        if (max0 < cont0)
-        {
-          r0 = i;
-          max0 = cont0;
-        }
-        cont0 = 0;
-        cont1++;
+        initialPos.push_back({i, j});
       }
     }
-
-    if (max0 < cont0)
-    {
-      max0 = cont0;
-      r0 = N;
-    }
-    if (max1 < cont1)
-    {
-      max1 = cont1;
-      r1 = N;
-    }
-
-    int ans0 = 0;
-    int ans1 = 0;
-    for (int i = 0; i < N; i++)
-    {
-      if (((r0 - max0 > i) || (i >= r0)))
-      {
-        if (S[i] == '0')
-          ans0 += 2;
-        else
-          ans0 += 1;
-      }
-
-      if (((r1 - max1 > i) || (i >= r1)))
-      {
-        if (S[i] == '1')
-          ans1 += 2;
-        else
-          ans1 += 1;
-      }
-    }
-
-    cout << min(ans0, ans1) << "\n";
   }
+
+  vector<int> colMat = {-1, 0, 1, 0};
+  vector<int> rowMat = {0, 1, 0, -1};
+
+  ll prevSize = 0;
+  while (true)
+  {
+    map<pair<int, int>, ll> M;
+    for (int i = prevSize; i < initialPos.size(); i++)
+    {
+      auto pos = initialPos[i];
+      if (aleadyPos.count(pos) > 0)
+        continue;
+      else
+        aleadyPos.insert(pos);
+
+      for (int i = 0; i < 4; i++)
+      {
+        if ((0 <= pos.first + colMat[i]) && (pos.first + colMat[i] < H) && (0 <= pos.second + rowMat[i]) && (pos.second + rowMat[i] < W))
+          M[{pos.first + colMat[i], pos.second + rowMat[i]}]++;
+      }
+    }
+
+    prevSize = initialPos.size();
+    for (auto iter = M.begin(); iter != M.end(); ++iter)
+    {
+      if ((iter->second == 1) && (!aleadyPos.count(iter->first)) && (count(iter->first, aleadyPos) == 1))
+        initialPos.push_back(iter->first);
+    }
+
+    // cout << prevSize << " " << initialPos.size() << "\n";
+    if (initialPos.size() == prevSize)
+      break;
+  }
+
+  // for (int i = 0; i < initialPos.size(); i++)
+  //   cout << initialPos[i].first << ", " << initialPos[i].second << "\n";
+
+  cout << initialPos.size() << "\n";
 }
