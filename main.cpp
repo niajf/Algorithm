@@ -1,63 +1,42 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-#include <queue>
+#include <algorithm>
 
 using namespace std;
-typedef long long ll;
+
+void recursion(int num, int r)
+{
+  pair<int, int> p;
+  p.first = num / 2;
+  p.second = num - p.first;
+
+  if (r > 0)
+  {
+    recursion(p.first, r - 1);
+    recursion(p.second, r - 1);
+  }
+  else
+  {
+    cout << p.first << " " << p.second << " ";
+  }
+}
 
 int main()
 {
   int N, K;
   cin >> N >> K;
 
-  vector<ll> A(N), B(N), C(N);
+  int elem = 1;
   for (int i = 0; i < N; i++)
-  {
-    cin >> A[i] >> B[i] >> C[i];
-  }
+    elem *= 2;
 
-  vector<ll> entry(N, -1);
+  if ((K / elem) * elem == K)
+    cout << 0 << "\n";
+  else
+    cout << 1 << "\n";
 
-  priority_queue<
-      pair<ll, ll>,
-      vector<pair<ll, ll>>,
-      greater<>>
-      heap;
-
-  ll occupancy = 0;
-  ll time = 0;
-
-  entry[0] = A[0];
-  occupancy = C[0];
-  time = A[0];
-  heap.push({time + B[0], C[0]});
-
-  for (int i = 1; i < N; i++)
-  {
-    time = max(A[i], time);
-
-    while (!heap.empty() && heap.top().first < time)
-    {
-      occupancy -= heap.top().second;
-      heap.pop();
-    }
-
-    while (occupancy + C[i] > K)
-    {
-      pair<ll, ll> p = heap.top();
-      heap.pop();
-      time = p.first;
-      occupancy -= p.second;
-    }
-
-    occupancy += C[i];
-    heap.push({time + B[i], C[i]});
-    entry[i] = time;
-  }
-
-  for (int i = 0; i < N; i++)
-    cout << entry[i] << endl;
+  recursion(K, N - 1);
+  cout << "\n";
 
   return 0;
 }
