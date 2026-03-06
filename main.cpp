@@ -1,126 +1,116 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <queue>
+#include <cmath>
 
 using namespace std;
-typedef long long ll;
-
-pair<ll, ll> direction(char c)
-{
-  pair<ll, ll> dire = {0, 0};
-
-  switch (c)
-  {
-  case 'U':
-    dire = {-1, 0};
-    break;
-
-  case 'R':
-    dire = {0, 1};
-    break;
-
-  case 'D':
-    dire = {1, 0};
-    break;
-
-  case 'L':
-    dire = {0, -1};
-    break;
-  }
-
-  return dire;
-}
 
 int main()
 {
-  ll N, M, L;
-  pair<ll, ll> t, a;
+  int H, W;
+  cin >> H >> W;
 
-  cin >> t.first >> t.second >> a.first >> a.second;
-  cin >> N >> M >> L;
+  // 0 -> 入力通り、　1 -> 入力反転
+  vector<vector<vector<char>>> table(H, vector<vector<char>>(W, vector<char>(2)));
 
-  vector<pair<char, ll>> S(M), T(L);
-  for (int i = 0; i < M; i++)
-    cin >> S[i].first >> S[i].second;
+  // 縦、横、深さ(0, 1), 経路
+  queue<vector<int>> que;
 
-  for (int i = 0; i < L; i++)
-    cin >> T[i].first >> T[i].second;
+  // 到達チェック用
+  vector<vector<vector<bool>>> ok(H, vector<vector<bool>>(W, vector<bool>(2, false)));
 
-  int si = 0, ti = 0;
-  int s_rem = S[0].second, t_rem = T[0].second;
+  vector<int> di = {-1, 0, 1, 0};
+  vector<int> dj = {0, 1, 0, -1};
 
-  ll ans = 0;
-  for (int i = 0; i < M + L - 1; i++)
+  // テーブルの入力受付
+  for (int i = 0; i < H; i++)
   {
-    ll r0 = t.first - a.first;
-    ll c0 = t.second - a.second;
-
-    ll k = min(s_rem, t_rem);
-
-    ll delta_r = direction(S[si].first).first - direction(T[ti].first).first;
-    ll delta_c = direction(S[si].first).second - direction(T[ti].first).second;
-
-    // cout << s_rem << ", " << t_rem << " : " << k << " : " << r0 << ", " << c0 << " : " << delta_r << ", " << delta_c << endl;
-
-    if ((delta_r == 0) && (delta_c == 0))
+    for (int j = 0; j < W; j++)
     {
+      char c;
+      cin >> c;
+      table[i][j][0] = c;
 
-      if ((r0 == 0) && (c0 == 0))
+      if ((c == '.') || (c == '#') || (c == 'G') || (c == '?'))
+        table[i][j][1] = c;
+
+      else if (c == 'S')
       {
-        ans += k;
+        table[i][j][1] = c;
+        que.push({i, j, 0, 0});
       }
-    }
-    else if (delta_r == 0)
-    {
-      if (c0 % delta_c == 0)
-      {
-        ll time = -c0 / delta_c;
-        if ((0 < time) && (time <= k) && (r0 == 0))
-          ans++;
-      }
-    }
-    else if (delta_c == 0)
-    {
-      if (r0 % delta_r == 0)
-      {
-        ll time = -r0 / delta_r;
-        if ((0 < time) && (time <= k) && (c0 == 0))
-          ans++;
-      }
-    }
-    else
-    {
-      if ((c0 % delta_c == 0) && (r0 % delta_r == 0))
-      {
-        ll time_r = -r0 / delta_r;
-        ll time_c = -c0 / delta_c;
-        if ((time_r == time_c) && (0 < time_r) && (time_r <= k))
-          ans++;
-      }
-    }
 
-    s_rem -= k;
-    t_rem -= k;
+      else if (c == 'o')
+        table[i][j][1] = 'x';
 
-    t.first += k * direction(S[si].first).first;
-    t.second += k * direction(S[si].first).second;
-    a.first += k * direction(T[ti].first).first;
-    a.second += k * direction(T[ti].first).second;
-
-    if ((s_rem == 0) && (si + 1 < M))
-    {
-      si++;
-      s_rem = S[si].second;
-    }
-
-    if ((t_rem == 0) && (ti + 1 < L))
-    {
-      ti++;
-      t_rem = T[ti].second;
+      else if (c == 'x')
+        table[i][j][1] = 'o';
     }
   }
 
-  cout << ans << endl;
+  // for (int i = 0; i < H; i++)
+  // {
+  //   for (int j = 0; j < W; j++)
+  //   {
+  //     cout << table[i][j][0] << " ";
+  //   }
+  //   cout << endl;
+  // }
+  // cout << endl;
+  // for (int i = 0; i < H; i++)
+  // {
+  //   for (int j = 0; j < W; j++)
+  //   {
+  //     cout << table[i][j][1] << " ";
+  //   }
+  //   cout << endl;
+  // }
 
+  while (!que.empty())
+  {
+    vector<int> pos = que.front();
+    que.pop();
+
+    if (ok[pos[0]][pos[1]][pos[2]])
+      continue;
+
+    else
+    {
+      // ゴール以外の場合は現在の階層のみ探索済みにする
+      if (table[pos[0]][pos[1]][pos[2]] != 'G')
+        ok[pos[0]][pos[1]][pos[2]] = true;
+
+      // ゴールの場合は探索を終了
+      else
+      {
+        cout << pos[3] << endl;
+        return 0;
+      }
+    }
+
+    // cout << pos[0] << ", " << pos[1] << ", " << pos[2] << ", " << pos[3] << ", " << table[pos[0]][pos[1]][pos[2]] << endl;
+
+    // ?マスの場合は、階層を反転
+    int z = pos[2];
+    if (table[pos[0]][pos[1]][pos[2]] == '?')
+      z = abs(1 - z);
+
+    for (int k = 0; k < 4; k++)
+    {
+      // 遷移先がテーブルの範囲内か確認
+      if ((0 <= pos[0] + di[k]) && (pos[0] + di[k] < H) && (0 <= pos[1] + dj[k]) && (pos[1] + dj[k] < W))
+      {
+        // 到達できないマスには遷移しない
+        if ((table[pos[0] + di[k]][pos[1] + dj[k]][z] == '#') || (table[pos[0] + di[k]][pos[1] + dj[k]][z] == 'x'))
+          ;
+
+        // 到達可能なマスには、経路を+1して遷移する
+        else
+          que.push({pos[0] + di[k], pos[1] + dj[k], z, pos[3] + 1});
+      }
+    }
+  }
+
+  cout << -1 << endl;
   return 0;
 }
