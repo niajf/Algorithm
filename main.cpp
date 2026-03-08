@@ -1,35 +1,75 @@
 #include <iostream>
+#include <unordered_map>
+#include <stack>
 #include <vector>
-#include <string>
 
 using namespace std;
 
 int main()
 {
-  int N, M;
-  string S, T;
-  cin >> N >> M >> S >> T;
+  int N;
+  cin >> N;
 
-  vector<int> vec(N + 1, 0);
-  for (int i = 0; i < M; i++)
+  vector<int> A(N + 1);
+  for (int i = 1; i <= N; i++)
+    cin >> A[i];
+
+  vector<vector<int>> adj(N + 1, vector<int>());
+  for (int i = 0; i < N - 1; i++)
   {
-    int L, R;
-    cin >> L >> R;
-    vec[L - 1]++;
-    vec[R]--;
+    int u, v;
+    cin >> u >> v;
+
+    adj[u].push_back(v);
+    adj[v].push_back(u);
   }
 
-  for (int i = 0; i < N; i++)
-  {
-    if (i > 0)
-      vec[i] = vec[i] + vec[i - 1];
+  vector<bool> ans(N + 1, false);
+  unordered_map<int, int> unmap;
+  stack<tuple<int, int, bool>> stk;
+  int dup = 0;
 
-    if (vec[i] % 2)
-      cout << T[i];
+  stk.push({1, -1, true});
+
+  while (!stk.empty())
+  {
+    auto [n, p, flag] = stk.top();
+    stk.pop();
+
+    // cout << n << " " << p << " " << flag << " " << endl;
+
+    if (flag)
+    {
+      unmap[A[n]]++;
+      if (unmap[A[n]] == 2)
+        dup++;
+
+      if (dup > 0)
+        ans[n] = true;
+
+      // cout << unmap[A[n]] << endl;
+      // cout << dup << endl;
+
+      stk.push({n, p, false});
+
+      for (int node : adj[n])
+      {
+        if (node != p)
+          stk.push({node, n, true});
+      }
+    }
     else
-      cout << S[i];
+    {
+      if (unmap[A[n]] == 2)
+        dup--;
+      unmap[A[n]]--;
+    }
   }
-  cout << endl;
+
+  for (int i = 1; i <= N; i++)
+  {
+    cout << (ans[i] ? "Yes" : "No") << endl;
+  }
 
   return 0;
 }
