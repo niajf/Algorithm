@@ -7,48 +7,34 @@ typedef long long ll;
 
 int main()
 {
-  int T;
-  cin >> T;
+  ll N, M;
+  cin >> N >> M;
 
-  while (T--)
+  vector<tuple<ll, ll, ll>> table(M);
+  for (int i = 0; i < M; i++)
   {
-    ll N, M;
-    cin >> N >> M;
+    ll a, b;
+    cin >> a >> b;
 
-    vector<int> A(N), B(N);
-    ll sumA = 0, sumB = 0;
-    for (int i = 0; i < N; i++)
-    {
-      cin >> A[i];
-      sumA += A[i];
-    }
-
-    for (int i = 0; i < N; i++)
-    {
-      cin >> B[i];
-      sumB += B[i];
-    }
-
-    sort(A.begin(), A.end());
-    sort(B.begin(), B.end());
-
-    int s = 0, e = N - 1;
-    ll c = 0;
-    while ((e >= 0) && (s < N))
-    {
-      if (A[e] + B[s] >= M)
-      {
-        c++;
-        e--;
-        s++;
-      }
-      else
-      {
-        s++;
-      }
-    }
-
-    cout << sumA + sumB - c * M << endl;
+    ll diff = a - b;
+    table[i] = {diff, a, b};
   }
+
+  sort(table.begin(), table.end());
+
+  ll ans = 0;
+  for (int idx = 0; idx < M; idx++)
+  {
+    auto [diff, a, b] = table[idx];
+    if (N >= a)
+    {
+      ll cnt = (N - a) / diff;
+      ans += cnt + 1;
+      N -= (cnt + 1) * diff;
+    }
+  }
+
+  cout << ans << endl;
+
   return 0;
 }
