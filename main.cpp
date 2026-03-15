@@ -1,86 +1,69 @@
 #include <iostream>
-#include <vector>
-#include <map>
+#include <algorithm>
+#include <cmath>
 
 using namespace std;
 typedef long long ll;
 
 int main()
 {
-    int N, L, R;
-    cin >> N >> L >> R;
-
-    map<char, vector<int>> mp;
-    for (int i = 0; i < N; i++)
-    {
-        char c;
-        cin >> c;
-        mp[c].push_back(i);
-    }
+    ll L, R, D, U;
+    cin >> L >> R >> D >> U;
 
     ll ans = 0;
-    for (auto itr = mp.begin(); itr != mp.end(); ++itr)
+    for (ll i = D; i <= U; i++)
     {
-        auto v = itr->second;
-        // cout << endl;
-
+        // even
+        if (i % 2 == 0)
         {
-            int l = 0, r = 1;
-            ll cnt = 1;
-            while ((r < v.size()) && (l != r))
-            {
-                // cout << v[l] << " " << v[r] << " " << cnt << " ";
+            ans += max(min(abs(i), R), (ll)0);
+            // cout << ans << endl;
 
-                if (v[r] - v[l] <= R)
-                {
-                    r++;
-                    ans += cnt;
-                    cnt++;
-                }
-                else
-                {
-                    l++;
+            ans -= max(min(abs(i), (L - 1)), (ll)0);
+            // cout << ans << endl;
 
-                    if (l == r)
-                        r++;
-                    else
-                        cnt--;
-                }
+            ans += max(R - abs(i), (ll)0) / 2;
+            // cout << ans << endl;
 
-                // cout << ans << endl;
-            }
-            // ans += cnt;
+            ans -= max((L - 1) - abs(i), (ll)0) / 2;
+            // cout << ans << endl;
+
+            ans += max(min(abs(i), -L), (ll)0);
+            // cout << ans << endl;
+
+            ans += max(min((ll)0, (R + 1)), -abs(i));
+            // cout << ans << endl;
+
+            ans += max(-abs(i) - L, (ll)0) / 2;
+            // cout << ans << endl;
+
+            ans -= max(-abs(i) - (R + 1), (ll)0) / 2;
+            // cout << ans << endl;
+
+            if ((L <= 0) && (0 <= R))
+                ans++;
+            // cout << ans << endl;
         }
-        // cout << ans << endl;
 
+        // odd
+        else
         {
-            int l = 0, r = 1;
-            ll cnt = 1;
-            while ((r < v.size()) && (l != r))
-            {
-                // cout << v[l] << " " << v[r] << " " << cnt << " ";
-                if (v[r] - v[l] < L)
-                {
-                    r++;
-                    ans -= cnt;
-                    cnt++;
-                }
-                else
-                {
-                    l++;
+            ans += max(R - abs(i), (ll)0) / 2 + max(R - abs(i), (ll)0) % 2;
+            // cout << ans << endl;
 
-                    if (l == r)
-                        r++;
-                    else
-                        cnt--;
-                }
-                // cout << ans << endl;
-            }
-            // ans -= cnt;
+            ans -= max((L - 1) - abs(i), (ll)0) / 2 + max((L - 1) - abs(i), (ll)0) % 2;
+            // cout << ans << endl;
+
+            ans += max(-abs(i) - L, (ll)0) / 2 + max(-abs(i) - L, (ll)0) % 2;
+            // cout << ans << endl;
+
+            ans -= max(-abs(i) - (R + 1), (ll)0) / 2 + max(-abs(i) - (R + 1), (ll)0) % 2;
+            // cout << ans << endl;w
         }
-        // cout << ans << endl;
+
+        // cout << i << " : " << ans << endl;
     }
-
     cout << ans << endl;
+
     return 0;
 }
