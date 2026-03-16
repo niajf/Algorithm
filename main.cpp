@@ -1,69 +1,83 @@
 #include <iostream>
-#include <algorithm>
+#include <vector>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
-typedef long long ll;
+bool solve()
+{
+    int N;
+    cin >> N;
+
+    vector<pair<int, int>> A(N);
+    for (int i = 0; i < N; i++)
+    {
+        int num;
+        cin >> num;
+
+        if (num > 0)
+            A[i] = {abs(num), 1};
+        else
+            A[i] = {abs(num), -1};
+    }
+
+    bool allSame = true;
+    bool absSame = true;
+    int neg = 0, pos = 0;
+
+    int a = A[0].first * A[0].second;
+    int absa = A[0].first;
+
+    for (int i = 0; i < N; i++)
+    {
+        if (A[i].first * A[i].second != a)
+            allSame = false;
+
+        if (A[i].first != absa)
+            absSame = false;
+
+        if (A[i].second > 0)
+            pos++;
+        else
+            neg++;
+    }
+
+    if (allSame)
+    {
+        // cout << 1 << endl;
+        return true;
+    }
+
+    if ((absSame) && (min(neg, pos) == N / 2))
+    {
+        // cout << 2 << endl;
+        return true;
+    }
+
+    sort(A.begin(), A.end());
+    for (int i = 1; i < N - 1; i++)
+    {
+        if ((A[i].first * A[i].second) * (A[i].first * A[i].second) != (A[i - 1].first * A[i - 1].second) * (A[i + 1].first * A[i + 1].second))
+        {
+            // cout << 3 << endl;
+            return false;
+        }
+    }
+
+    // cout << 4 << endl;
+    return true;
+}
 
 int main()
 {
-    ll L, R, D, U;
-    cin >> L >> R >> D >> U;
+    int T;
+    cin >> T;
 
-    ll ans = 0;
-    for (ll i = D; i <= U; i++)
+    while (T--)
     {
-        // even
-        if (i % 2 == 0)
-        {
-            ans += max(min(abs(i), R), (ll)0);
-            // cout << ans << endl;
-
-            ans -= max(min(abs(i), (L - 1)), (ll)0);
-            // cout << ans << endl;
-
-            ans += max(R - abs(i), (ll)0) / 2;
-            // cout << ans << endl;
-
-            ans -= max((L - 1) - abs(i), (ll)0) / 2;
-            // cout << ans << endl;
-
-            ans += max(min(abs(i), -L), (ll)0);
-            // cout << ans << endl;
-
-            ans += max(min((ll)0, (R + 1)), -abs(i));
-            // cout << ans << endl;
-
-            ans += max(-abs(i) - L, (ll)0) / 2;
-            // cout << ans << endl;
-
-            ans -= max(-abs(i) - (R + 1), (ll)0) / 2;
-            // cout << ans << endl;
-
-            if ((L <= 0) && (0 <= R))
-                ans++;
-            // cout << ans << endl;
-        }
-
-        // odd
+        if (solve())
+            cout << "Yes" << endl;
         else
-        {
-            ans += max(R - abs(i), (ll)0) / 2 + max(R - abs(i), (ll)0) % 2;
-            // cout << ans << endl;
-
-            ans -= max((L - 1) - abs(i), (ll)0) / 2 + max((L - 1) - abs(i), (ll)0) % 2;
-            // cout << ans << endl;
-
-            ans += max(-abs(i) - L, (ll)0) / 2 + max(-abs(i) - L, (ll)0) % 2;
-            // cout << ans << endl;
-
-            ans -= max(-abs(i) - (R + 1), (ll)0) / 2 + max(-abs(i) - (R + 1), (ll)0) % 2;
-            // cout << ans << endl;w
-        }
-
-        // cout << i << " : " << ans << endl;
+            cout << "No" << endl;
     }
-    cout << ans << endl;
-
-    return 0;
 }
