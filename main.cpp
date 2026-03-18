@@ -1,73 +1,51 @@
 #include <iostream>
 #include <vector>
-#include <cmath>
-#include <algorithm>
+#include <string>
 
 using namespace std;
+
 int main()
 {
-    int T;
-    cin >> T;
-
-    while (T--)
+    int n, q;
+    cin >> n >> q;
+    vector<int> op(q), p(q);
+    vector<string> s(q);
+    for (int i = 0; i < q; i++)
     {
-        int N;
-        cin >> N;
-
-        vector<long long> S(N);
-        long long l, r;
-        for (int i = 0; i < N; i++)
+        cin >> op[i] >> p[i];
+        if (op[i] == 2)
         {
-            cin >> S[i];
-            S[i] *= -1;
+            cin >> s[i];
+            reverse(s[i].begin(), s[i].end());
         }
-
-        l = S[0];
-        r = S[N - 1];
-
-        sort(S.begin(), S.end());
-
-        auto beginIter = lower_bound(S.begin(), S.end(), l);
-        auto endIter = lower_bound(S.begin(), S.end(), r);
-
-        // cout << endl;
-        // cout << "start : " << *beginIter << endl;
-        // cout << "end : " << *endIter << endl;
-
-        if (*beginIter <= *endIter)
-        {
-            cout << 2 << endl;
-            continue;
-        }
-
-        int ans = 1;
-        bool ok = false;
-
-        while (beginIter != endIter)
-        {
-
-            auto iter = lower_bound(endIter, beginIter - 1, 2 * (*beginIter));
-            ans++;
-
-            // cout << 2 * (*beginIter) << " : " << *iter << endl;
-
-            if ((2 * (*beginIter) > *iter))
-                break;
-
-            else if ((iter == endIter))
-            {
-                ok = true;
-                break;
-            }
-
-            beginIter = iter;
-        }
-
-        if (ok)
-            cout << ans << endl;
-        else
-            cout << -1 << endl;
     }
 
-    return 0;
+    string ans;
+    int i = 0;
+    for (int t = q - 1; t >= 0; t--)
+    {
+        if (op[t] == 1)
+        {
+            if (i == p[t])
+            {
+                i = 0;
+            }
+        }
+        else if (op[t] == 2)
+        {
+            if (i == p[t])
+            {
+                ans += s[t];
+            }
+        }
+        else
+        {
+            if (i == 0)
+            {
+                i = p[t];
+            }
+        }
+    }
+    reverse(ans.begin(), ans.end());
+    cout << ans << endl;
 }
