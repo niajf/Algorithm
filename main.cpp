@@ -1,51 +1,54 @@
 #include <iostream>
 #include <vector>
-#include <string>
+#include <queue>
+#include <set>
 
 using namespace std;
 
 int main()
 {
-    int n, q;
-    cin >> n >> q;
-    vector<int> op(q), p(q);
-    vector<string> s(q);
-    for (int i = 0; i < q; i++)
+    int N, M;
+    cin >> N >> M;
+
+    vector<vector<pair<int, int>>> adj(N);
+    for (int i = 0; i < M; i++)
     {
-        cin >> op[i] >> p[i];
-        if (op[i] == 2)
+        int A, B, W;
+        cin >> A >> B >> W;
+
+        A--;
+        B--;
+        adj[A].push_back({B, W});
+    }
+
+    vector<vector<bool>> visited(N, vector<bool>((1 << 10), false));
+    queue<tuple<int, int, int>> que;
+    que.push({0, 0, 0});
+
+    while (!que.empty())
+    {
+        auto [node, wei, val] = que.front();
+        que.pop();
+
+        val = val ^ wei;
+        if (visited[node][val])
+            continue;
+        else
+            visited[node][val] = 1;
+
+        for (auto [n, w] : adj[node])
+            que.push({n, w, val});
+    }
+
+    for (int i = 0; i < (1 << 10); i++)
+    {
+        if (visited[N - 1][i])
         {
-            cin >> s[i];
-            reverse(s[i].begin(), s[i].end());
+            cout << i << "\n";
+            return 0;
         }
     }
 
-    string ans;
-    int i = 0;
-    for (int t = q - 1; t >= 0; t--)
-    {
-        if (op[t] == 1)
-        {
-            if (i == p[t])
-            {
-                i = 0;
-            }
-        }
-        else if (op[t] == 2)
-        {
-            if (i == p[t])
-            {
-                ans += s[t];
-            }
-        }
-        else
-        {
-            if (i == 0)
-            {
-                i = p[t];
-            }
-        }
-    }
-    reverse(ans.begin(), ans.end());
-    cout << ans << endl;
+    cout << -1 << "\n";
+    return 0;
 }
