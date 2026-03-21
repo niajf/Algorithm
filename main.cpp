@@ -1,54 +1,38 @@
 #include <iostream>
 #include <vector>
-#include <queue>
-#include <set>
+#include <algorithm>
 
 using namespace std;
 
 int main()
 {
-    int N, M;
-    cin >> N >> M;
+    int N, K;
+    cin >> N >> K;
 
-    vector<vector<pair<int, int>>> adj(N);
-    for (int i = 0; i < M; i++)
+    vector<int> A(N);
+    for (int i = 0; i < N; i++)
     {
-        int A, B, W;
-        cin >> A >> B >> W;
-
-        A--;
-        B--;
-        adj[A].push_back({B, W});
+        int a;
+        cin >> a;
+        A[i] = a % K;
     }
 
-    vector<vector<bool>> visited(N, vector<bool>((1 << 10), false));
-    queue<tuple<int, int, int>> que;
-    que.push({0, 0, 0});
+    sort(A.begin(), A.end());
 
-    while (!que.empty())
+    // for (int i = 0; i < N; i++)
+    // {
+    //     cout << A[i] << " ";
+    // }
+    // cout << endl;
+
+    int opt = A[N - 1] - A[0];
+    for (int i = 0; i < N - 1; i++)
     {
-        auto [node, wei, val] = que.front();
-        que.pop();
-
-        val = val ^ wei;
-        if (visited[node][val])
-            continue;
-        else
-            visited[node][val] = 1;
-
-        for (auto [n, w] : adj[node])
-            que.push({n, w, val});
+        if (A[i] + K - A[i + 1] < opt)
+            opt = A[i] + K - A[i + 1];
     }
 
-    for (int i = 0; i < (1 << 10); i++)
-    {
-        if (visited[N - 1][i])
-        {
-            cout << i << "\n";
-            return 0;
-        }
-    }
+    cout << opt << endl;
 
-    cout << -1 << "\n";
     return 0;
 }
