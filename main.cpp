@@ -1,73 +1,41 @@
 #include <iostream>
 #include <vector>
-#include <map>
-#include <set>
-#include <unordered_set>
 #include <queue>
-#include <string>
-#include <cmath>
+#include <stack>
+#include <tuple>
 #include <algorithm>
+#include <set>
+#include <map>
+#include <unordered_set>
+#include <unordered_map>
 
 using namespace std;
+using ll = long long;
+
+bool in(ll x, ll y, ll R)
+{
+    return (2 * x + 1) * (2 * x + 1) + (2 * y + 1) * (2 * y + 1) <= 4 * R * R;
+}
 
 int main()
 {
-    string S, T;
-    cin >> S >> T;
+    ll R;
+    cin >> R;
 
-    int sizeS = S.size();
-    int sizeT = T.size();
+    ll res = 4 * (R - 1) + 1;
+    ll cnt = 0;
+    ll up = R - 1;
 
-    vector<vector<int>> pos(26, vector<int>(sizeS, -1));
-    for (int i = 0; i < sizeS; i++)
+    for (ll i = 1; i < R; i++)
     {
-        pos[S[i] - 'a'][i] = i;
+        while (!in(i, up, R))
+            up--;
+
+        cnt += up;
     }
 
-    for (int i = 0; i < 26; i++)
-    {
-        for (int j = sizeS - 2; j >= 0; j--)
-        {
-            if (pos[i][j] == -1)
-                pos[i][j] = pos[i][j + 1];
-        }
-    }
-
-    // for (int i = 0; i < 26; i++)
-    // {
-    //     for (int j = 0; j < sizeS; j++)
-    //     {
-    //         cout << pos[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-
-    long long ans = 0;
-    for (int l = 0; l < sizeS; l++)
-    {
-        int r = l;
-        for (auto c : T)
-        {
-            if (r >= sizeS)
-            {
-                r = sizeS + 1;
-                break;
-            }
-            r = pos[c - 'a'][r];
-            if (r == -1)
-            {
-                r = sizeS + 1;
-                break;
-            }
-            r++;
-        }
-
-        // cout << l << " " << r << " " << r - l - 1 << endl;
-
-        ans += r - l - 1;
-    }
-
-    cout << ans << endl;
+    res += 4 * cnt;
+    cout << res << endl;
 
     return 0;
 }
