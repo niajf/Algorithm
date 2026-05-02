@@ -12,30 +12,22 @@
 using namespace std;
 using ll = long long;
 
-bool in(ll x, ll y, ll R)
-{
-    return (2 * x + 1) * (2 * x + 1) + (2 * y + 1) * (2 * y + 1) <= 4 * R * R;
-}
-
 int main()
 {
-    ll R;
-    cin >> R;
+    string S;
+    cin >> S;
 
-    ll res = 4 * (R - 1) + 1;
-    ll cnt = 0;
-    ll up = R - 1;
+    ll dp[3] = {0, 0, 0};
 
-    for (ll i = 1; i < R; i++)
+    for (char ch : S)
     {
-        while (!in(i, up, R))
-            up--;
-
-        cnt += up;
+        int c = ch - 'a';
+        ll ne = (dp[(c + 1) % 3] + dp[(c + 2) % 3] + 1) % 998244353;
+        dp[c] = (dp[c] + ne) % 998244353;
     }
 
-    res += 4 * cnt;
-    cout << res << endl;
+    ll ans = (dp[0] + dp[1] + dp[2]) % 998244353;
+    cout << ans << endl;
 
     return 0;
 }
