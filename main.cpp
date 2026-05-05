@@ -12,95 +12,59 @@
 using namespace std;
 using ll = long long;
 
-struct Home
-{
-    int homeID;
-
-    Home(int ID) { homeID = ID; };
-};
-
-struct Bird
-{
-    int birdID;
-    Home *homePtr;
-
-    Bird(int ID, Home *ptr)
-    {
-        birdID = ID;
-        homePtr = ptr;
-    }
-};
+const int INF = (int)1e9;
 
 int main()
 {
+    int N, W;
+    cin >> N >> W;
 
-    int N, Q;
-    cin >> N >> Q;
+    const int INF = 2e9;
 
-    vector<Home> homeVec;
-    vector<Bird> birdVec;
-    homeVec.reserve(N); // 再確保によるアドレスずれを防ぐ
+    vector<vector<pair<int, int>>> blocks(W);
     for (int i = 0; i < N; i++)
-        homeVec.emplace_back(i);
-    for (int i = 0; i < N; i++)
-        birdVec.emplace_back(i, &homeVec[i]);
-
-    vector<int> labelToPos(N); // labelToPos[label] = homeVec の index
-    for (int i = 0; i < N; i++)
-        labelToPos[i] = i;
-
-    // for (int i = 0; i < N; i++)
-    // {
-    //     cout << homeVec[i].homeID << endl;
-    // }
-
-    // for (int i = 0; i < N; i++)
-    // {
-    //     cout << birdVec[i].birdID << " " << birdVec[i].homePtr->homeID << endl;
-    // }
-
-    while (Q--)
     {
-        int type;
-        cin >> type;
-
-        if (type == 1)
-        {
-            int a, b;
-            cin >> a >> b;
-            a--;
-            b--;
-
-            birdVec[a].homePtr = &homeVec[labelToPos[b]];
-        }
-
-        else if (type == 2)
-        {
-            int a, b;
-            cin >> a >> b;
-            a--;
-            b--;
-
-            int pa = labelToPos[a], pb = labelToPos[b];
-            swap(homeVec[pa].homeID, homeVec[pb].homeID);
-            swap(labelToPos[a], labelToPos[b]);
-        }
-
-        else
-        {
-            int a;
-            cin >> a;
-            a--;
-
-            cout << birdVec[a].homePtr->homeID + 1 << endl;
-        }
-
-        // for (int i = 0; i < N; i++)
-        // {
-        //     cout << birdVec[i].homePtr->homeID << " ";
-        // }
-        // cout << endl;
+        int x, y;
+        cin >> x >> y;
+        x--;
+        blocks[x].push_back({y, i});
     }
 
+    vector<int> cnt(N, 0);
+    vector<int> D(N + 2, 0);
+
+    for (int i = 0; i < W; i++)
+    {
+        sort(blocks[i].begin(), blocks[i].end());
+        for (int j = 0; j < (int)blocks[i].size(); j++)
+        {
+            cnt[blocks[i][j].second] = j;
+            D[j] = max(D[j], blocks[i][j].first);
+        }
+        D[blocks[i].size()] = INF;
+    }
+
+    for (auto d : D)
+        cout << d << " ";
+    cout << endl;
+
+    for (int i = 0; i < N; i++)
+    {
+        D[i + 1] = max(D[i + 1], D[i] + 1);
+    }
+
+    for (auto d : D)
+        cout << d << " ";
+    cout << endl;
+
+    int Q;
+    cin >> Q;
+    while (Q--)
+    {
+        int T, A;
+        cin >> T >> A;
+        A--;
+        cout << (T < D[cnt[A]] ? "Yes" : "No") << "\n";
+    }
     return 0;
 }
