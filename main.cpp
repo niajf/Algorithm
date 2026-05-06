@@ -11,60 +11,64 @@
 
 using namespace std;
 using ll = long long;
-
 const int INF = (int)1e9;
+
+// Era(n)を呼んだ後、isprime[i]=iが素数かどうか　となっている。
+vector<bool> isprime;
+// 返り値は素数のリスト。
+vector<ll> Era(int n)
+{
+    isprime.resize(n, true);
+    vector<ll> res;
+    isprime[0] = false;
+    isprime[1] = false;
+    for (ll i = 2; i < n; ++i)
+        isprime[i] = true;
+    for (ll i = 2; i < n; ++i)
+    {
+        if (isprime[i])
+        {
+            res.push_back(i);
+            for (ll j = i * 2; j < n; j += i)
+                isprime[j] = false;
+        }
+    }
+    return res;
+}
 
 int main()
 {
-    int N, W;
-    cin >> N >> W;
+    ll N;
+    cin >> N;
 
-    const int INF = 2e9;
-
-    vector<vector<pair<int, int>>> blocks(W);
-    for (int i = 0; i < N; i++)
+    ll ans = 0;
+    vector<ll> v = Era(1000005);
+    for (ll p : v)
     {
-        int x, y;
-        cin >> x >> y;
-        x--;
-        blocks[x].push_back({y, i});
+        if (p * p * p * p * p * p * p * p <= N)
+            ans++;
+        else
+            break;
     }
 
-    vector<int> cnt(N, 0);
-    vector<int> D(N + 2, 0);
-
-    for (int i = 0; i < W; i++)
+    for (ll p : v)
     {
-        sort(blocks[i].begin(), blocks[i].end());
-        for (int j = 0; j < (int)blocks[i].size(); j++)
+        if (p * p * p * p > N)
+            break;
+
+        for (ll q : v)
         {
-            cnt[blocks[i][j].second] = j;
-            D[j] = max(D[j], blocks[i][j].first);
+            if (q <= p)
+                continue;
+
+            if (p * p * q * q <= N)
+                ans++;
+            else
+                break;
         }
-        D[blocks[i].size()] = INF;
     }
 
-    for (auto d : D)
-        cout << d << " ";
-    cout << endl;
+    cout << ans << endl;
 
-    for (int i = 0; i < N; i++)
-    {
-        D[i + 1] = max(D[i + 1], D[i] + 1);
-    }
-
-    for (auto d : D)
-        cout << d << " ";
-    cout << endl;
-
-    int Q;
-    cin >> Q;
-    while (Q--)
-    {
-        int T, A;
-        cin >> T >> A;
-        A--;
-        cout << (T < D[cnt[A]] ? "Yes" : "No") << "\n";
-    }
     return 0;
 }
