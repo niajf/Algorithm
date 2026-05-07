@@ -8,67 +8,76 @@
 #include <map>
 #include <unordered_set>
 #include <unordered_map>
+#include <cctype>
 
 using namespace std;
 using ll = long long;
 const int INF = (int)1e9;
 
-// Era(n)を呼んだ後、isprime[i]=iが素数かどうか　となっている。
-vector<bool> isprime;
-// 返り値は素数のリスト。
-vector<ll> Era(int n)
+ll solve(ll n, ll k, bool &flip)
 {
-    isprime.resize(n, true);
-    vector<ll> res;
-    isprime[0] = false;
-    isprime[1] = false;
-    for (ll i = 2; i < n; ++i)
-        isprime[i] = true;
-    for (ll i = 2; i < n; ++i)
+    if (n < k)
     {
-        if (isprime[i])
+        flip = !flip;
+        ll base = n;
+        while (base < k)
         {
-            res.push_back(i);
-            for (ll j = i * 2; j < n; j += i)
-                isprime[j] = false;
+            base *= 2;
         }
+        base /= 2;
+        return k - base;
     }
-    return res;
+
+    return k;
 }
 
 int main()
 {
-    ll N;
-    cin >> N;
+    string S;
+    int Q;
+    cin >> S >> Q;
 
-    ll ans = 0;
-    vector<ll> v = Era(1000005);
-    for (ll p : v)
+    ll N = S.size();
+    vector<ll> K(Q);
+    for (int i = 0; i < Q; i++)
     {
-        if (p * p * p * p * p * p * p * p <= N)
-            ans++;
-        else
-            break;
+        cin >> K[i];
     }
 
-    for (ll p : v)
+    for (int i = 0; i < Q; i++)
     {
-        if (p * p * p * p > N)
-            break;
 
-        for (ll q : v)
+        ll base = N;
+        ll num = K[i];
+        bool flip = false;
+
+        while (true)
         {
-            if (q <= p)
+            ll rem = solve(base, num, flip);
+
+            if (rem > N)
+            {
+                num = rem;
                 continue;
-
-            if (p * p * q * q <= N)
-                ans++;
+            }
             else
+            {
+                num = rem;
                 break;
+            }
         }
-    }
 
-    cout << ans << endl;
+        char c = S[num - 1];
+        if (flip)
+        {
+            if (islower(c))
+                c = toupper(c);
+            else
+                c = tolower(c);
+        }
+        cout << c << " ";
+    }
+    cout << endl;
 
     return 0;
 }
