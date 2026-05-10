@@ -14,70 +14,49 @@ using namespace std;
 using ll = long long;
 const int INF = (int)1e9;
 
-ll solve(ll n, ll k, bool &flip)
-{
-    if (n < k)
-    {
-        flip = !flip;
-        ll base = n;
-        while (base < k)
-        {
-            base *= 2;
-        }
-        base /= 2;
-        return k - base;
-    }
-
-    return k;
-}
-
 int main()
 {
-    string S;
-    int Q;
-    cin >> S >> Q;
+    ll N, K;
+    cin >> N >> K;
 
-    ll N = S.size();
-    vector<ll> K(Q);
-    for (int i = 0; i < Q; i++)
+    ll l = 1e18;
+    ll r = 9e18;
+    vector<ll> A(N);
+    for (int i = 0; i < N; i++)
     {
-        cin >> K[i];
+        cin >> A[i];
+
+        l = min(l, A[i]);
     }
 
-    for (int i = 0; i < Q; i++)
+    while (l <= r)
     {
-
-        ll base = N;
-        ll num = K[i];
-        bool flip = false;
-
-        while (true)
+        ll mid = l + (r - l) / 2;
+        ll cnt = 0;
+        bool ok = true;
+        for (int i = 0; i < N; i++)
         {
-            ll rem = solve(base, num, flip);
-
-            if (rem > N)
-            {
-                num = rem;
+            if (A[i] >= mid)
                 continue;
-            }
-            else
+
+            ll add = (mid - A[i] + i) / (i + 1);
+
+            if (cnt > K - add)
             {
-                num = rem;
+                ok = false;
                 break;
             }
+
+            cnt += add;
         }
 
-        char c = S[num - 1];
-        if (flip)
-        {
-            if (islower(c))
-                c = toupper(c);
-            else
-                c = tolower(c);
-        }
-        cout << c << " ";
+        if (ok)
+            l = mid + 1;
+        else
+            r = mid - 1;
     }
-    cout << endl;
+
+    cout << r << endl;
 
     return 0;
 }
