@@ -16,47 +16,35 @@ const int INF = (int)1e9;
 
 int main()
 {
-    ll N, K;
-    cin >> N >> K;
+    int N;
+    cin >> N;
 
-    ll l = 1e18;
-    ll r = 9e18;
-    vector<ll> A(N);
+    vector<int> H(N);
     for (int i = 0; i < N; i++)
     {
-        cin >> A[i];
-
-        l = min(l, A[i]);
+        cin >> H[i];
     }
 
-    while (l <= r)
+    stack<int> stk;
+    vector<int> ans = {0};
+    for (int i = N - 2; i >= 0; i--)
     {
-        ll mid = l + (r - l) / 2;
-        ll cnt = 0;
-        bool ok = true;
-        for (int i = 0; i < N; i++)
+        if (!stk.empty())
         {
-            if (A[i] >= mid)
-                continue;
-
-            ll add = (mid - A[i] + i) / (i + 1);
-
-            if (cnt > K - add)
+            while (!stk.empty() && stk.top() < H[i + 1])
             {
-                ok = false;
-                break;
+                stk.pop();
             }
-
-            cnt += add;
         }
 
-        if (ok)
-            l = mid + 1;
-        else
-            r = mid - 1;
+        stk.push(H[i + 1]);
+        ans.push_back((int)stk.size());
     }
 
-    cout << r << endl;
+    reverse(ans.begin(), ans.end());
+    for (auto n : ans)
+        cout << n << " ";
+    cout << endl;
 
     return 0;
 }
