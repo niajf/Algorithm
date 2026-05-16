@@ -19,44 +19,39 @@ using ll = long long;
 
 int main()
 {
-    int X, Q;
-    cin >> X >> Q;
+    int N;
+    cin >> N;
 
-    priority_queue<int> low;
-    priority_queue<int, vector<int>, greater<int>> high;
-    low.push(X);
-
-    for (int i = 1; i <= Q; i++)
+    vector<int> A(N);
+    vector<int> zero(N, 0);
+    vector<int> ans(N, 0);
+    for (int i = 0; i < N; i++)
     {
-        int a, b;
-        cin >> a >> b;
-
-        for (int v : {a, b})
-        {
-            if (v <= low.top())
-            {
-                low.push(v);
-            }
-            else
-            {
-                high.push(v);
-            }
-        }
-
-        int target_low = i + 1;
-        while ((int)low.size() > target_low)
-        {
-            high.push(low.top());
-            low.pop();
-        }
-        while ((int)low.size() < target_low)
-        {
-            low.push(high.top());
-            high.pop();
-        }
-
-        cout << low.top() << "\n";
+        cin >> A[i];
     }
+
+    for (int i = 0; i < N; i++)
+    {
+        if (i > 0)
+            zero[i] += zero[i - 1];
+
+        int n = i + A[i] + i - zero[i];
+        if (n < N)
+        {
+            zero[n + 1]++;
+            ans[i] = 0;
+        }
+        else
+            ans[i] = A[i] + i - (N - i - 1) - zero[i];
+    }
+
+    // for (auto n : zero)
+    //     cout << n << " ";
+    // cout << endl;
+
+    for (auto n : ans)
+        cout << n << " ";
+    cout << endl;
 
     return 0;
 }
