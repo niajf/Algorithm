@@ -19,43 +19,44 @@ using ll = long long;
 
 int main()
 {
-    int N;
-    cin >> N;
+    int X, Q;
+    cin >> X >> Q;
 
-    vector<double> K(N);
-    vector<unordered_map<int, double>> A(N);
-    vector<set<int>> sets(N);
-    for (int i = 0; i < N; i++)
-    {
-        cin >> K[i];
-        for (int k = 0; k < K[i]; k++)
-        {
-            int a;
-            cin >> a;
-            a--;
-            A[i][a]++;
-            sets[i].insert(a);
-        }
-    }
+    priority_queue<int> low;
+    priority_queue<int, vector<int>, greater<int>> high;
+    low.push(X);
 
-    double ans = 0.f;
-    for (int i = 0; i < N - 1; i++)
+    for (int i = 1; i <= Q; i++)
     {
-        for (int j = i + 1; j < N; j++)
+        int a, b;
+        cin >> a >> b;
+
+        for (int v : {a, b})
         {
-            set<int> res;
-            set_intersection(all(sets[i]), all(sets[j]), inserter(res, res.end()));
-            double prob = 0.f;
-            for (const auto key : res)
+            if (v <= low.top())
             {
-                prob += (A[i][key] / K[i]) * (A[j][key] / K[j]);
+                low.push(v);
             }
-            ans = max(ans, prob);
+            else
+            {
+                high.push(v);
+            }
         }
-    }
 
-    cout << fixed << setprecision(10);
-    cout << ans << endl;
+        int target_low = i + 1;
+        while ((int)low.size() > target_low)
+        {
+            high.push(low.top());
+            low.pop();
+        }
+        while ((int)low.size() < target_low)
+        {
+            low.push(high.top());
+            high.pop();
+        }
+
+        cout << low.top() << "\n";
+    }
 
     return 0;
 }
