@@ -16,68 +16,57 @@
 
 using namespace std;
 using ll = long long;
+int N, M;
+vector<vector<int>> arr;
 
-int H, W, K;
-int ans = 0;
-vector<vector<char>> table;
-vector<int> di = {-1, 0, 1, 0};
-vector<int> dj = {0, 1, 0, -1};
-
-void dfs(int i, int j, int cnt, vector<vector<bool>> &visited)
+void solve(int start, int depth)
 {
-    visited[i][j] = true;
+    // if (depth == N)
+    // {
+    //     arr.back().push_back(start);
+    //     vector<int> copy = arr.back();
+    //     start++;
+    //     while (start <= M)
+    //     {
+    //         arr.push_back(copy);
+    //         arr.back().back() = start;
+    //         start++;
+    //     }
 
-    if (cnt == K)
+    //     return;
+    // }
+
+    vector<int> copy = arr.back();
+    for (int i = start; i <= M - (N - depth) * 10; i++)
     {
-        ans++;
-        visited[i][j] = false;
-        return;
+        if (arr.back().size() >= N)
+            arr.push_back(copy);
+        arr.back().push_back(i);
+        // vector<int> copy = arr.back();
+
+        if (depth < N)
+            solve(i + 10, depth + 1);
+        // arr.push_back(copy);
     }
-
-    for (int k = 0; k < 4; k++)
-    {
-        int ni = i + di[k];
-        int nj = j + dj[k];
-
-        if (!(0 <= ni && ni < H && 0 <= nj && nj < W))
-            continue;
-
-        if (table[ni][nj] == '#')
-            continue;
-
-        if (!visited[ni][nj])
-            dfs(ni, nj, cnt + 1, visited);
-    }
-
-    visited[i][j] = false;
 }
 
 int main()
 {
-    // int H, W, K;
-    cin >> H >> W >> K;
-    table.resize(H, vector<char>(W));
-    for (int i = 0; i < H; i++)
+    cin >> N >> M;
+    arr.push_back({});
+
+    int start = 1;
+    solve(start, 1);
+
+    cout << arr.size() << endl;
+    for (auto vec : arr)
     {
-        for (int j = 0; j < W; j++)
+        for (auto n : vec)
         {
-            cin >> table[i][j];
+            cout << n << " ";
         }
+        cout << endl;
     }
-
-    for (int i = 0; i < H; i++)
-    {
-        for (int j = 0; j < W; j++)
-        {
-            if (table[i][j] != '.')
-                continue;
-
-            vector<vector<bool>> visited(H, vector<bool>(W, false));
-            dfs(i, j, 0, visited);
-        }
-    }
-
-    cout << ans << endl;
 
     return 0;
 }
