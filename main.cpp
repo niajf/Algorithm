@@ -20,80 +20,62 @@ using ll = long long;
 
 int main()
 {
-    int N;
-    double S, T;
-    cin >> N >> S >> T;
+    int N, M;
+    cin >> N >> M;
 
-    double ans = (double)1e308;
+    vector<vector<pair<int, int>>> edges(N);
+    for (int i = 0; i < M; i++)
+    {
+        int u, v, w;
+        cin >> u >> v >> w;
+        u--;
+        v--;
+        edges[u].push_back({v, w});
+        edges[v].push_back({u, -w});
+    }
 
-    vector<vector<pair<int, int>>> pos(N);
+    vector<ll> ans(N, 0);
+    vector<bool> visited(N, false);
+    queue<pair<int, pair<int, int>>> que;
 
     for (int i = 0; i < N; i++)
     {
-        int a, b, c, d;
-        cin >> a >> b >> c >> d;
+        if (visited[i])
+            continue;
 
-        pos[i].push_back({a, b});
-        pos[i].push_back({c, d});
-    }
-
-    vector<int> perm(N);
-    for (int i = 0; i < N; i++)
-    {
-        perm[i] = i;
-    }
-
-    do
-    {
-        for (int bit = 0; bit < (1 << N); bit++)
+        visited[i] = true;
+        ans[i] = 0;
+        for (auto v : edges[i])
         {
-            double x = 0.0;
-            double y = 0.0;
-            double time = 0.0;
-            vector<int> B;
-            for (int i = 0; i < N; i++)
-            {
-                if (bit & (1 << i))
-                {
-                    B.push_back(1);
-                    time += sqrt((pos[perm[i]][1].first - x) * (pos[perm[i]][1].first - x) + (pos[perm[i]][1].second - y) * (pos[perm[i]][1].second - y)) / S;
-                    x = pos[perm[i]][1].first;
-                    y = pos[perm[i]][1].second;
-                    // cout << time << " ";
-                    time += sqrt((pos[perm[i]][0].first - x) * (pos[perm[i]][0].first - x) + (pos[perm[i]][0].second - y) * (pos[perm[i]][0].second - y)) / T;
-                    x = pos[perm[i]][0].first;
-                    y = pos[perm[i]][0].second;
-                    // cout << time << " ";
-                }
-                else
-                {
-                    B.push_back(0);
-                    time += sqrt((pos[perm[i]][0].first - x) * (pos[perm[i]][0].first - x) + (pos[perm[i]][0].second - y) * (pos[perm[i]][0].second - y)) / S;
-                    x = pos[perm[i]][0].first;
-                    y = pos[perm[i]][0].second;
-                    // cout << time << " ";
-                    time += sqrt((pos[perm[i]][1].first - x) * (pos[perm[i]][1].first - x) + (pos[perm[i]][1].second - y) * (pos[perm[i]][1].second - y)) / T;
-                    x = pos[perm[i]][1].first;
-                    y = pos[perm[i]][1].second;
-                    // cout << time << " ";
-                }
-            }
-            ans = min(ans, time);
-            // cout << ans << endl;
-            // for (auto n : perm)
-            // {
-            //     cout << n << " ";
-            // }
-            // cout << endl;
-            // for (auto n : B)
-            // {
-            //     cout << n << " ";
-            // }
-            // cout << endl;
+            que.push({i, v});
+            ans[v.first] = ans[i] + (ll)v.second;
         }
-    } while (next_permutation(all(perm)));
+        while (!que.empty())
+        {
+            auto [u, v] = que.front();
+            que.pop();
 
-    cout << fixed << setprecision(15) << ans << endl;
+            if (visited[v.first])
+                continue;
 
-    return 0;
+            visited[v.first] = true;
+            ans[v.first] = ans[u] + (ll)v.second;
+            for (auto p : edges[v.first])
+            {
+                que.push({v.first, p});
+            }
+        }
+
+        // for (auto n : ans)
+        // {
+        //     cout << n << " ";
+        // }
+        // cout << endl;
+    }
+
+    for (auto n : ans)
+    {
+        cout << n << " ";
+    }
+    cout << endl;
 }
