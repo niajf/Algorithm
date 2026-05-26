@@ -18,64 +18,40 @@
 using namespace std;
 using ll = long long;
 
+const ll INF = -(1LL << 60);
+
 int main()
 {
-    int N, M;
-    cin >> N >> M;
+    int N;
+    cin >> N;
 
-    vector<vector<pair<int, int>>> edges(N);
-    for (int i = 0; i < M; i++)
-    {
-        int u, v, w;
-        cin >> u >> v >> w;
-        u--;
-        v--;
-        edges[u].push_back({v, w});
-        edges[v].push_back({u, -w});
-    }
+    vector<ll> A(N);
+    for (auto &a : A)
+        cin >> a;
 
-    vector<ll> ans(N, 0);
-    vector<bool> visited(N, false);
-    queue<pair<int, pair<int, int>>> que;
+    vector<vector<ll>> dp(N + 1, vector<ll>(2, INF));
+
+    dp[0][0] = 0;
 
     for (int i = 0; i < N; i++)
     {
-        if (visited[i])
-            continue;
+        // 倒さない
+        dp[i + 1][0] = max(dp[i + 1][0], dp[i][0]);
+        dp[i + 1][1] = max(dp[i + 1][1], dp[i][1]);
 
-        visited[i] = true;
-        ans[i] = 0;
-        for (auto v : edges[i])
-        {
-            que.push({i, v});
-            ans[v.first] = ans[i] + (ll)v.second;
-        }
-        while (!que.empty())
-        {
-            auto [u, v] = que.front();
-            que.pop();
-
-            if (visited[v.first])
-                continue;
-
-            visited[v.first] = true;
-            ans[v.first] = ans[u] + (ll)v.second;
-            for (auto p : edges[v.first])
-            {
-                que.push({v.first, p});
-            }
-        }
-
-        // for (auto n : ans)
-        // {
-        //     cout << n << " ";
-        // }
-        // cout << endl;
+        // 倒す
+        dp[i + 1][1] = max(dp[i + 1][1], dp[i][0] + A[i]);
+        dp[i + 1][0] = max(dp[i + 1][0], dp[i][1] + 2 * A[i]);
     }
 
-    for (auto n : ans)
-    {
-        cout << n << " ";
-    }
-    cout << endl;
+    // for (auto vec : dp)
+    // {
+    //     for (auto p : vec)
+    //     {
+    //         cout << p << " ";
+    //     }
+    //     cout << endl;
+    // }
+
+    cout << max(dp[N][0], dp[N][1]) << endl;
 }
