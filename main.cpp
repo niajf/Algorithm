@@ -14,76 +14,62 @@
 
 #define all(a) a.begin(), a.end()
 #define rall(a) a.rbegin(), a.rend()
-#define rep(i, n) for (int i = 0; i < n; i++)
+#define rep(i, l, r) for (int i = l; i < r; i++)
 
 using namespace std;
 using ll = long long;
 
 int main()
 {
-    int H, W;
-    cin >> H >> W;
+    int N;
+    string S;
+    cin >> N >> S;
 
-    vector<string> table(H);
-    for (int i = 0; i < H; i++)
-        cin >> table[i];
-
-    vector<int> di = {-1, -1, 0, 1, 1, 1, 0, -1};
-    vector<int> dj = {0, 1, 1, 1, 0, -1, -1, -1};
-
-    auto in = [&](int i, int j)
-    { return 0 <= i && i < H && 0 <= j && j < W; };
-
-    // 前処理: 元の # の8近傍の . を # に塗り替える(始点を1マスシフト)
-    vector<string> base(H, string(W, '.'));
-    for (int i = 0; i < H; i++)
-        for (int j = 0; j < W; j++)
-            if (table[i][j] == '#')
-                for (int k = 0; k < 8; k++)
-                {
-                    int ni = i + di[k], nj = j + dj[k];
-                    if (in(ni, nj) && table[ni][nj] == '.')
-                        base[ni][nj] = '#';
-                }
-
-    // 塗り替え後の # を距離0の始点として多重始点BFS
-    queue<tuple<int, int, int>> que;
-    vector<vector<int>> cntMat(H, vector<int>(W, -2));
-
-    for (int i = 0; i < H; i++)
-        for (int j = 0; j < W; j++)
-            if (base[i][j] == '#')
-                que.push({i, j, 0});
-
-    while (!que.empty())
+    vector<int> C(N);
+    rep(i, 0, N)
     {
-        auto [i, j, cnt] = que.front();
-        que.pop();
-
-        if (cntMat[i][j] != -2)
-            continue;
-        cntMat[i][j] = cnt;
-
-        for (int k = 0; k < 8; k++)
-        {
-            int ni = i + di[k];
-            int nj = j + dj[k];
-
-            if (!in(ni, nj))
-                continue;
-            if (cntMat[ni][nj] != -2)
-                continue;
-
-            que.push({ni, nj, cnt + 1});
-        }
+        cin >> C[i];
     }
 
-    for (int i = 0; i < H; i++)
+    vector<vector<ll>> left(N, vector<ll>(2)), right(N, vector<ll>(2));
+    left[0][0] = (S[0] == '0' ? 0 : C[0]);
+    left[0][1] = (S[0] == '1' ? 0 : C[0]);
+    for (int i = 1; i < N; i++)
     {
-        for (int j = 0; j < W; j++)
-            cout << (cntMat[i][j] % 2 == 0 ? '.' : '#');
-        cout << '\n';
+        left[i][0] = left[i - 1][1] + (S[i] == '0' ? 0 : C[i]);
+        left[i][1] = left[i - 1][0] + (S[i] == '1' ? 0 : C[i]);
     }
+
+    right[N - 1][0] = (S[N - 1] == '0' ? 0 : C[N - 1]);
+    right[N - 1][1] = (S[N - 1] == '1' ? 0 : C[N - 1]);
+    for (int i = N - 2; i >= 0; i--)
+    {
+        right[i][0] = right[i + 1][1] + (S[i] == '0' ? 0 : C[i]);
+        right[i][1] = right[i + 1][0] + (S[i] == '1' ? 0 : C[i]);
+    }
+
+    ll ans = (ll)1e18;
+    for (int i = 0; i < N - 1; i++)
+    {
+        ans = min(ans, min(left[i][0] + right[i + 1][0], left[i][1] + right[i + 1][1]));
+    }
+
+    cout << ans << endl;
+
+    // for (auto vec : left)
+    // {
+    //     for (auto n : vec)
+    //         cout << n << " ";
+    //     cout << endl;
+    // }
+
+    // cout << endl;
+
+    // for (auto vec : right)
+    // {
+    //     for (auto n : vec)
+    //         cout << n << " ";
+    //     cout << endl;
 
     return 0;
 }
