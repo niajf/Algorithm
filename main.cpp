@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include <vector>
 #include <list>
 #include <queue>
@@ -24,24 +25,66 @@ using ll = long long;
 
 int main()
 {
-	int N;
-	cin >> N;
+	ll N, M, K, X, Y;
+	cin >> N >> M >> K >> X >> Y;
 
-	priority_queue<int, vector<int>, greater<int>> pq;
+	vector<ll> A(N), B(M);
 
-	for (int i = 0; i < N; i++)
+	for (ll i = 0; i < N; i++)
 	{
-		int a;
-		cin >> a;
-
-		pq.push(a);
-
-		if (pq.size() > 3)
-			pq.pop();
-
-		if (pq.size() == 3)
-			cout << pq.top() << endl;
+		cin >> A[i];
 	}
 
+	for (ll i = 0; i < M; i++)
+	{
+		cin >> B[i];
+	}
+
+	sort(all(B));
+	sort(all(A));
+
+	for (ll i = 1; i < N; i++)
+	{
+		A[i] += A[i - 1];
+	}
+
+	ll ans = (ll)distance(A.begin(), upper_bound(all(A), X + Y * K));
+	ll cntM = 0;
+
+	for (ll i = 0; i < M; i++)
+	{
+		ll useK = (B[i] + K - 1) / K;
+
+		if (useK <= Y)
+		{
+			Y -= useK;
+			cntM++;
+
+			ll ex = K * useK - B[i];
+			X += ex;
+		}
+
+		auto it = upper_bound(all(A), X + Y * K);
+		ll n = (ll)distance(A.begin(), it) + cntM;
+
+		// cout << "i" << ":" << i << endl;
+		// cout << "useK" << ":" << useK << endl;
+		// cout << "cntN" << ":" << n - cntM << endl;
+		// cout << "cntM" << ":" << cntM << endl;
+		// cout << "X" << ":" << X << endl;
+		// cout << "Y" << ":" << Y << endl;
+		// cout << endl;
+
+		ans = max(ans, n);
+
+		if (useK > Y)
+		{
+			cout << ans << endl;
+			return 0;
+		}
+		// cout << "," << ans << endl;
+	}
+
+	cout << ans << endl;
 	return 0;
 }
