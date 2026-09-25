@@ -25,66 +25,21 @@ using ll = long long;
 
 int main()
 {
-	ll N, M, K, X, Y;
-	cin >> N >> M >> K >> X >> Y;
+	string S;
+	cin >> S;
 
-	vector<ll> A(N), B(M);
-
-	for (ll i = 0; i < N; i++)
+	string ans(2 * S.size() - 1, 'o');
+	int cnt = 0;
+	for (int i = 0; i < ans.size(); i++)
 	{
-		cin >> A[i];
-	}
-
-	for (ll i = 0; i < M; i++)
-	{
-		cin >> B[i];
-	}
-
-	sort(all(B));
-	sort(all(A));
-
-	for (ll i = 1; i < N; i++)
-	{
-		A[i] += A[i - 1];
-	}
-
-	ll ans = (ll)distance(A.begin(), upper_bound(all(A), X + Y * K));
-	ll cntM = 0;
-
-	for (ll i = 0; i < M; i++)
-	{
-		ll useK = (B[i] + K - 1) / K;
-
-		if (useK <= Y)
+		if (i % 2 == 0)
 		{
-			Y -= useK;
-			cntM++;
-
-			ll ex = K * useK - B[i];
-			X += ex;
+			ans[i] = S[cnt];
+			cnt++;
 		}
-
-		auto it = upper_bound(all(A), X + Y * K);
-		ll n = (ll)distance(A.begin(), it) + cntM;
-
-		// cout << "i" << ":" << i << endl;
-		// cout << "useK" << ":" << useK << endl;
-		// cout << "cntN" << ":" << n - cntM << endl;
-		// cout << "cntM" << ":" << cntM << endl;
-		// cout << "X" << ":" << X << endl;
-		// cout << "Y" << ":" << Y << endl;
-		// cout << endl;
-
-		ans = max(ans, n);
-
-		if (useK > Y)
-		{
-			cout << ans << endl;
-			return 0;
-		}
-		// cout << "," << ans << endl;
 	}
 
 	cout << ans << endl;
+
 	return 0;
 }
