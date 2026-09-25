@@ -25,21 +25,43 @@ using ll = long long;
 
 int main()
 {
-	string S;
-	cin >> S;
+	int N;
+	int coin100 = 0;
+	int coin10 = 0;
+	int coin1 = 0;
+	vector<int> A;
 
-	string ans(2 * S.size() - 1, 'o');
-	int cnt = 0;
-	for (int i = 0; i < ans.size(); i++)
+	cin >> N;
+	A.resize(N);
+
+	for (int i = 0; i < N; i++)
 	{
-		if (i % 2 == 0)
-		{
-			ans[i] = S[cnt];
-			cnt++;
-		}
+		cin >> A[i];
 	}
 
-	cout << ans << endl;
+	for (int i = 0; i < N; i++)
+	{
+		int useBill = ceil((float)A[i] / 1000.f);
+		int ex = useBill * 1000 - A[i];
+
+		int c100 = 0;
+		int c10 = 0;
+		int c1 = 0;
+
+		c100 = floor((float)ex / 100.f);
+		ex = ex - c100 * 100;
+
+		c10 = floor((float)ex / 10.f);
+		ex = ex - c10 * 10;
+
+		c1 = ex;
+
+		coin100 += c100;
+		coin10 += c10;
+		coin1 += c1;
+	}
+
+	cout << coin1 << " " << coin10 << " " << coin100 << endl;
 
 	return 0;
 }
