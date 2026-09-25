@@ -25,43 +25,107 @@ using ll = long long;
 
 int main()
 {
-	int N;
-	int coin100 = 0;
-	int coin10 = 0;
-	int coin1 = 0;
-	vector<int> A;
+	int N, S;
+	ll L;
+	vector<ll> A;
+	vector<vector<ll>> B;
 
-	cin >> N;
-	A.resize(N);
+	cin >> N >> S >> L;
+	A.resize(N - 1);
+	B.resize(N, vector<ll>(N, 0));
 
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N - 1; i++)
 	{
 		cin >> A[i];
 	}
 
 	for (int i = 0; i < N; i++)
 	{
-		int useBill = ceil((float)A[i] / 1000.f);
-		int ex = useBill * 1000 - A[i];
 
-		int c100 = 0;
-		int c10 = 0;
-		int c1 = 0;
+		for (int j = i - 1; j >= 0; j--)
+		{
+			B[i][j] = B[i][j + 1] + A[j];
+		}
 
-		c100 = floor((float)ex / 100.f);
-		ex = ex - c100 * 100;
-
-		c10 = floor((float)ex / 10.f);
-		ex = ex - c10 * 10;
-
-		c1 = ex;
-
-		coin100 += c100;
-		coin10 += c10;
-		coin1 += c1;
+		for (int j = i + 1; j < N; j++)
+		{
+			B[i][j] = B[i][j - 1] + A[j - 1];
+		}
 	}
 
-	cout << coin1 << " " << coin10 << " " << coin100 << endl;
+	// for (int i = 0; i < N; i++)
+	// {
+	// 	for (int j = 0; j < N; j++)
+	// 	{
+	// 		cout << B[i][j] << " ";
+	// 	}
+	// 	cout << endl;
+	// }
+
+	// 訪れる街の最大値
+	int ans = 0;
+
+	// 左側に探索
+	for (int i = S - 1; i >= 0; i--)
+	{
+		int townNum = S - i;
+		ll length = B[S - 1][i];
+
+		// cout << townNum << endl;
+		// cout << length << endl;
+
+		if (length > L)
+			continue;
+
+		auto ptr = upper_bound(B[i].begin() + i, B[i].end(), L - length);
+		--ptr;
+		// cout << "*ptr: " << *ptr << endl;
+
+		int dis = distance(B[i].begin(), ptr) - (S - 1);
+		if (dis > 0)
+			townNum += dis;
+
+		ans = max(ans, townNum);
+
+		// cout << townNum << endl;
+		// cout << endl;
+	}
+
+	for (int i = S - 1; i < N; i++)
+	{
+		int townNum = i - S + 2;
+		ll length = B[S - 1][i];
+
+		// cout << "start town: " << i << endl;
+		// cout << townNum << endl;
+		// cout << length << endl;
+
+		if (length > L)
+			continue;
+
+		int maxTownIdx = -1;
+		for (int j = i; j >= 0; j--)
+		{
+			if (B[i][j] + length > L)
+			{
+				break;
+			}
+
+			maxTownIdx = j;
+		}
+
+		// cout << "town: " << B[i][maxTownIdx] << endl;
+		int dis = S - 1 - maxTownIdx;
+		if (dis > 0)
+			townNum += dis;
+
+		ans = max(ans, townNum);
+
+		// cout << townNum << endl;
+		// cout << endl;
+	}
+
+	cout << ans << endl;
 
 	return 0;
 }
