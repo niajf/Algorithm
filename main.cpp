@@ -23,109 +23,72 @@ const float PI = 3.14159265359;
 using namespace std;
 using ll = long long;
 
-int main()
+vector<bool> isprime;
+vector<ll> Era(int n)
 {
-	int N, S;
-	ll L;
-	vector<ll> A;
-	vector<vector<ll>> B;
-
-	cin >> N >> S >> L;
-	A.resize(N - 1);
-	B.resize(N, vector<ll>(N, 0));
-
-	for (int i = 0; i < N - 1; i++)
+	isprime.resize(n, true);
+	vector<ll> res;
+	isprime[0] = false;
+	isprime[1] = false;
+	for (ll i = 2; i < n; ++i)
+		isprime[i] = true;
+	for (ll i = 2; i < n; ++i)
 	{
-		cin >> A[i];
-	}
-
-	for (int i = 0; i < N; i++)
-	{
-
-		for (int j = i - 1; j >= 0; j--)
+		if (isprime[i])
 		{
-			B[i][j] = B[i][j + 1] + A[j];
-		}
-
-		for (int j = i + 1; j < N; j++)
-		{
-			B[i][j] = B[i][j - 1] + A[j - 1];
+			res.push_back(i);
+			for (ll j = i * 2; j < n; j += i)
+				isprime[j] = false;
 		}
 	}
+	return res;
+}
 
-	// for (int i = 0; i < N; i++)
-	// {
-	// 	for (int j = 0; j < N; j++)
-	// 	{
-	// 		cout << B[i][j] << " ";
-	// 	}
-	// 	cout << endl;
-	// }
+bool resolve(string n, string s)
+{
+	if (n.size() != s.size())
+		return false;
 
-	// 訪れる街の最大値
-	int ans = 0;
-
-	// 左側に探索
-	for (int i = S - 1; i >= 0; i--)
+	for (int i = 0; i < s.size(); i++)
 	{
-		int townNum = S - i;
-		ll length = B[S - 1][i];
-
-		// cout << townNum << endl;
-		// cout << length << endl;
-
-		if (length > L)
-			continue;
-
-		auto ptr = upper_bound(B[i].begin() + i, B[i].end(), L - length);
-		--ptr;
-		// cout << "*ptr: " << *ptr << endl;
-
-		int dis = distance(B[i].begin(), ptr) - (S - 1);
-		if (dis > 0)
-			townNum += dis;
-
-		ans = max(ans, townNum);
-
-		// cout << townNum << endl;
-		// cout << endl;
-	}
-
-	for (int i = S - 1; i < N; i++)
-	{
-		int townNum = i - S + 2;
-		ll length = B[S - 1][i];
-
-		// cout << "start town: " << i << endl;
-		// cout << townNum << endl;
-		// cout << length << endl;
-
-		if (length > L)
-			continue;
-
-		int maxTownIdx = -1;
-		for (int j = i; j >= 0; j--)
+		for (int j = i + 1; j < s.size(); j++)
 		{
-			if (B[i][j] + length > L)
+			if (s[i] == s[j])
 			{
-				break;
+				if (n[i] != n[j])
+					return false;
 			}
 
-			maxTownIdx = j;
+			if (n[i] == n[j])
+			{
+				if (s[i] != s[j])
+					return false;
+			}
 		}
-
-		// cout << "town: " << B[i][maxTownIdx] << endl;
-		int dis = S - 1 - maxTownIdx;
-		if (dis > 0)
-			townNum += dis;
-
-		ans = max(ans, townNum);
-
-		// cout << townNum << endl;
-		// cout << endl;
 	}
 
-	cout << ans << endl;
+	return true;
+}
 
+int main()
+{
+
+	string S;
+	cin >> S;
+
+	string numStr(S.size(), '9');
+	int numInt = stoi(numStr);
+	vector<ll> prime = Era(numInt);
+
+	for (int i = 0; i < prime.size(); i++)
+	{
+		if (resolve(to_string(prime[i]), S))
+		{
+			cout << prime[i] << endl;
+			return 0;
+		}
+	}
+
+	cout << -1 << endl;
 	return 0;
 }
