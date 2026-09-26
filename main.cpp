@@ -25,47 +25,50 @@ using ll = long long;
 
 int main()
 {
-	int N, Q;
-	cin >> N >> Q;
+	int N;
+	cin >> N;
 
-	vector<int> P, A;
-	set<int> st;
-	map<int, int> mp;
-	P.resize(N);
-	A.resize(Q);
+	vector<ll> A, B, ans;
+	A.resize(N);
+	B.resize(N);
+	ans.resize(N, 1);
 
 	for (int i = 0; i < N; i++)
-	{
-		cin >> P[i];
-		st.insert(P[i]);
-	}
-
-	for (int i = 0; i < Q; i++)
 	{
 		cin >> A[i];
 	}
 
-	for (int i = 0; i < Q; i++)
+	for (int i = 0; i < N; i++)
 	{
-		if (st.count(A[i]))
+		cin >> B[i];
+	}
+
+	bool ok = false;
+	for (int i = 0; i < N; i++)
+	{
+		A[i] -= B[i];
+
+		if (A[i] > 0)
 		{
-			P.push_back(A[i]);
-			mp[A[i]]++;
+			ok = true;
+			ans[i] = 1000000000000000000;
+			// cout << ans[i] << endl;
 		}
 	}
 
-	for (int i = 0; i < P.size(); i++)
+	if (ok)
 	{
-		if (mp[P[i]] > 0)
+		cout << "Yes" << endl;
+		for (int i = 0; i < N; i++)
 		{
-			mp[P[i]]--;
+			cout << ans[i] << " ";
 		}
-		else
-		{
-			cout << P[i] << " ";
-		}
+		cout << endl;
+	}
+	else
+	{
+		cout << "No" << endl;
 	}
 
-	cout << endl;
 	return 0;
 }
