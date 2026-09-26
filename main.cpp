@@ -23,72 +23,49 @@ const float PI = 3.14159265359;
 using namespace std;
 using ll = long long;
 
-vector<bool> isprime;
-vector<ll> Era(int n)
-{
-	isprime.resize(n, true);
-	vector<ll> res;
-	isprime[0] = false;
-	isprime[1] = false;
-	for (ll i = 2; i < n; ++i)
-		isprime[i] = true;
-	for (ll i = 2; i < n; ++i)
-	{
-		if (isprime[i])
-		{
-			res.push_back(i);
-			for (ll j = i * 2; j < n; j += i)
-				isprime[j] = false;
-		}
-	}
-	return res;
-}
-
-bool resolve(string n, string s)
-{
-	if (n.size() != s.size())
-		return false;
-
-	for (int i = 0; i < s.size(); i++)
-	{
-		for (int j = i + 1; j < s.size(); j++)
-		{
-			if (s[i] == s[j])
-			{
-				if (n[i] != n[j])
-					return false;
-			}
-
-			if (n[i] == n[j])
-			{
-				if (s[i] != s[j])
-					return false;
-			}
-		}
-	}
-
-	return true;
-}
-
 int main()
 {
+	int N;
+	vector<vector<int>> table;
 
-	string S;
-	cin >> S;
+	cin >> N;
+	table.resize(floor((float)N / 10.f), vector<int>(10));
+	table.push_back(vector<int>(N % 10));
 
-	string numStr(S.size(), '9');
-	int numInt = stoi(numStr);
-	vector<ll> prime = Era(numInt);
-
-	for (int i = 0; i < prime.size(); i++)
+	for (int i = 0; i < N; i++)
 	{
-		if (resolve(to_string(prime[i]), S))
+		cin >> table[floor((float)i / 10.f)][i % 10];
+	}
+
+	// for (int i = 0; i < table.size(); i++)
+	// {
+	// 	for (int j = 0; j < table[i].size(); j++)
+	// 	{
+	// 		cout << table[i][j] << " ";
+	// 	}
+	// 	cout << endl;
+	// }
+
+	for (int i = 0; i < table.size(); i++)
+	{
+		sort(all(table[i]));
+		for (int j = 0; j < 10; j++)
 		{
-			cout << prime[i] << endl;
-			return 0;
+			if (i * 10 + j + 1 > N)
+			{
+				cout << "Yes" << endl;
+				return 0;
+			}
+
+			// cout << table[i][j] << " " << i * 10 + j + 1 << endl;
+			if (table[i][j] != i * 10 + j + 1)
+			{
+				cout << "No" << endl;
+				return 0;
+			}
 		}
 	}
 
-	cout << -1 << endl;
+	cout << "Yes" << endl;
 	return 0;
 }
