@@ -25,47 +25,47 @@ using ll = long long;
 
 int main()
 {
-	int N;
-	vector<vector<int>> table;
+	int N, Q;
+	cin >> N >> Q;
 
-	cin >> N;
-	table.resize(floor((float)N / 10.f), vector<int>(10));
-	table.push_back(vector<int>(N % 10));
+	vector<int> P, A;
+	set<int> st;
+	map<int, int> mp;
+	P.resize(N);
+	A.resize(Q);
 
 	for (int i = 0; i < N; i++)
 	{
-		cin >> table[floor((float)i / 10.f)][i % 10];
+		cin >> P[i];
+		st.insert(P[i]);
 	}
 
-	// for (int i = 0; i < table.size(); i++)
-	// {
-	// 	for (int j = 0; j < table[i].size(); j++)
-	// 	{
-	// 		cout << table[i][j] << " ";
-	// 	}
-	// 	cout << endl;
-	// }
-
-	for (int i = 0; i < table.size(); i++)
+	for (int i = 0; i < Q; i++)
 	{
-		sort(all(table[i]));
-		for (int j = 0; j < 10; j++)
-		{
-			if (i * 10 + j + 1 > N)
-			{
-				cout << "Yes" << endl;
-				return 0;
-			}
+		cin >> A[i];
+	}
 
-			// cout << table[i][j] << " " << i * 10 + j + 1 << endl;
-			if (table[i][j] != i * 10 + j + 1)
-			{
-				cout << "No" << endl;
-				return 0;
-			}
+	for (int i = 0; i < Q; i++)
+	{
+		if (st.count(A[i]))
+		{
+			P.push_back(A[i]);
+			mp[A[i]]++;
 		}
 	}
 
-	cout << "Yes" << endl;
+	for (int i = 0; i < P.size(); i++)
+	{
+		if (mp[P[i]] > 0)
+		{
+			mp[P[i]]--;
+		}
+		else
+		{
+			cout << P[i] << " ";
+		}
+	}
+
+	cout << endl;
 	return 0;
 }
