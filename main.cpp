@@ -25,49 +25,29 @@ using ll = long long;
 
 int main()
 {
-	int N;
-	cin >> N;
+	int N, K;
+	vector<int> vNumPerClass;
 
-	vector<ll> A, B, ans;
-	A.resize(N);
-	B.resize(N);
-	ans.resize(N, 1);
+	cin >> N >> K;
+	vNumPerClass.resize(K, 0);
 
+	// クラスごとに何人所属してるか
 	for (int i = 0; i < N; i++)
 	{
-		cin >> A[i];
+		int n;
+		cin >> n;
+		vNumPerClass[n - 1]++;
 	}
 
-	for (int i = 0; i < N; i++)
-	{
-		cin >> B[i];
-	}
+	sort(all(vNumPerClass));
+	int iMaxNum = vNumPerClass[K - 1];
+	// cout << iMaxNum << endl;
 
-	bool ok = false;
-	for (int i = 0; i < N; i++)
+	auto iter = lower_bound(all(vNumPerClass), iMaxNum - 1);
+	if (iter != vNumPerClass.end())
 	{
-		A[i] -= B[i];
-
-		if (A[i] > 0)
-		{
-			ok = true;
-			ans[i] = 1000000000000000000;
-			// cout << ans[i] << endl;
-		}
-	}
-
-	if (ok)
-	{
-		cout << "Yes" << endl;
-		for (int i = 0; i < N; i++)
-		{
-			cout << ans[i] << " ";
-		}
-		cout << endl;
-	}
-	else
-	{
-		cout << "No" << endl;
+		// cout << *iter << endl;
+		cout << distance(iter, vNumPerClass.end()) << endl;
 	}
 
 	return 0;
