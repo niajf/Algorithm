@@ -23,32 +23,46 @@ const float PI = 3.14159265359;
 using namespace std;
 using ll = long long;
 
+int N, K;
+
+void dfs(int index, vector<int> a)
+{
+	int sum = 0;
+	for (int i = 1; i <= N; i++)
+	{
+		sum += i * a[i];
+	}
+
+	if (index > N - 1)
+	{
+		if ((K - sum) % N == 0)
+		{
+			// cout << index << " " << sum << endl;
+			for (int i = 1; i < N; i++)
+			{
+				cout << a[i] << " ";
+			}
+			cout << (K - sum) / N << endl;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < (K - sum) / (index) + 1; i++)
+		{
+			dfs(index + 1, a);
+			a[index]++;
+		}
+	}
+}
+
 int main()
 {
-	int N, K;
-	vector<int> vNumPerClass;
+	vector<int> A;
 
 	cin >> N >> K;
-	vNumPerClass.resize(K, 0);
+	A.resize(N + 1, 0);
 
-	// クラスごとに何人所属してるか
-	for (int i = 0; i < N; i++)
-	{
-		int n;
-		cin >> n;
-		vNumPerClass[n - 1]++;
-	}
-
-	sort(all(vNumPerClass));
-	int iMaxNum = vNumPerClass[K - 1];
-	// cout << iMaxNum << endl;
-
-	auto iter = lower_bound(all(vNumPerClass), iMaxNum - 1);
-	if (iter != vNumPerClass.end())
-	{
-		// cout << *iter << endl;
-		cout << distance(iter, vNumPerClass.end()) << endl;
-	}
+	dfs(1, A);
 
 	return 0;
 }
