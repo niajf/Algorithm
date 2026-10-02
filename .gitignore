@@ -2,3 +2,5 @@ build.command
 makefile
 main
 .vscode
+.DS_Store
+workspace.code-workspace
