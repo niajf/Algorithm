@@ -26,75 +26,38 @@ using ll = long long;
 
 int main()
 {
-	ll N;
-	cin >> N;
+	int Q, V;
+	cin >> Q >> V;
+	priority_queue<int, vector<int>, less<int>> que;
 
-	priority_queue<ll, vector<ll>, greater<ll>> positiveQue;
-	priority_queue<ll, vector<ll>, less<ll>> negativeQue;
-
-	for (ll i = 0; i < N; i++)
+	for (int q = 0; q < Q; q++)
 	{
-		ll a;
-		cin >> a;
+		int type;
+		cin >> type;
 
-		if (a >= 0)
-			positiveQue.push(a);
-		else
-			negativeQue.push(a);
-	}
-
-	ll length = 0;
-	ll pos = 0;
-	for (ll i = 0; i < N; i++)
-	{
-		ll posLength = LLONG_MAX;
-		ll negLength = LLONG_MAX;
-
-		if (!positiveQue.empty())
-			posLength = abs(pos - positiveQue.top());
-
-		if (!negativeQue.empty())
-			negLength = abs(pos - negativeQue.top());
-
-		// cout << positiveQue.top() << " " << negativeQue.top() << " ";
-
-		if (posLength < negLength)
+		if (type == 1)
 		{
-			// cout << "Pos ";
-			pos = positiveQue.top();
-			length += posLength;
-			positiveQue.pop();
+			int t, w;
+			cin >> t >> w;
+
+			que.push(w - t);
 		}
-		else if (posLength > negLength)
+		else if (type == 2)
 		{
-			// cout << "Neg ";
-			pos = negativeQue.top();
-			length += negLength;
-			negativeQue.pop();
-		}
+			int t;
+			cin >> t;
 
-		else if (posLength == negLength)
-		{
-			if (positiveQue.top() < negativeQue.top())
+			if (que.empty())
 			{
-				// cout << "Pos ";
-				pos = positiveQue.top();
-				length += posLength;
-				positiveQue.pop();
+				cout << -1 << endl;
 			}
-
 			else
 			{
-				// cout << "Neg ";
-				pos = negativeQue.top();
-				length += negLength;
-				negativeQue.pop();
+				cout << min(V, que.top() + t) << endl;
+				que.pop();
 			}
 		}
-
-		// cout << pos << endl;
 	}
 
-	cout << length << endl;
 	return 0;
 }
