@@ -13,117 +13,88 @@
 #include <cctype>
 #include <iterator>
 #include <iomanip>
+#include <climits>
 
 #define all(a) a.begin(), a.end()
 #define rall(a) a.rbegin(), a.rend()
 #define rep(i, l, r, p) for (int i = l; i < r; i += p)
 
-const float PI = 3.14159265359;
+// const float PI = 3.14159265359;
 
 using namespace std;
 using ll = long long;
 
 int main()
 {
-	int H, W, K;
-	cin >> H >> W >> K;
+	ll N;
+	cin >> N;
 
-	vector<vector<char>> table(H, vector<char>(W));
+	priority_queue<ll, vector<ll>, greater<ll>> positiveQue;
+	priority_queue<ll, vector<ll>, less<ll>> negativeQue;
 
-	vector<int> safeColIndex;
-	vector<int> safeRowIndex;
-	for (int i = 0; i < H; i++)
+	for (ll i = 0; i < N; i++)
 	{
-		bool isSafe = true;
-		for (int j = 0; j < W; j++)
-		{
-			cin >> table[i][j];
-			if (table[i][j] == '#')
-				isSafe = false;
-		}
+		ll a;
+		cin >> a;
 
-		if (isSafe)
-			safeColIndex.push_back(i);
-	}
-
-	for (int i = 0; i < W; i++)
-	{
-		bool isSafe = true;
-		for (int j = 0; j < H; j++)
-		{
-			if (table[j][i] == '#')
-				isSafe = false;
-		}
-
-		if (isSafe)
-			safeRowIndex.push_back(i);
-	}
-
-	// for (auto n : safeColIndex)
-	// {
-	// 	cout << n << " ";
-	// }
-	// cout << endl;
-
-	// for (auto n : safeRowIndex)
-	// {
-	// 	cout << n << " ";
-	// }
-	// cout << endl;
-
-	using qType = pair<int, pair<int, int>>;
-	vector<vector<int>> costFromSafe(H, vector<int>(W, H + W));
-	priority_queue<qType, vector<qType>, greater<qType>> que;
-
-	vector<int> di = {-1, 0, 1, 0};
-	vector<int> dj = {0, 1, 0, -1};
-
-	for (auto h : safeColIndex)
-	{
-		for (auto w : safeRowIndex)
-		{
-			que.push({0, {h, w}});
-		}
-	}
-
-	int ans = 0;
-	while (!que.empty())
-	{
-		auto node = que.top();
-		que.pop();
-
-		int cost = node.first;
-		pair<int, int> pos = node.second;
-
-		if (cost > K)
-			break;
-
-		if (costFromSafe[pos.first][pos.second] != H + W)
-		{
-			continue;
-		}
+		if (a >= 0)
+			positiveQue.push(a);
 		else
-		{
-			costFromSafe[pos.first][pos.second] = cost;
-			ans++;
-		}
-
-		for (int k = 0; k < 4; k++)
-		{
-			int ni = pos.first + di[k];
-			int nj = pos.second + dj[k];
-
-			if (!(0 <= ni && ni < H && 0 <= nj && nj < W))
-				continue;
-
-			if (table[ni][nj] != '.')
-				continue;
-
-			que.push({cost + 1, {ni, nj}});
-		}
+			negativeQue.push(a);
 	}
 
-	cout << ans << endl;
+	ll length = 0;
+	ll pos = 0;
+	for (ll i = 0; i < N; i++)
+	{
+		ll posLength = LLONG_MAX;
+		ll negLength = LLONG_MAX;
 
+		if (!positiveQue.empty())
+			posLength = abs(pos - positiveQue.top());
+
+		if (!negativeQue.empty())
+			negLength = abs(pos - negativeQue.top());
+
+		// cout << positiveQue.top() << " " << negativeQue.top() << " ";
+
+		if (posLength < negLength)
+		{
+			// cout << "Pos ";
+			pos = positiveQue.top();
+			length += posLength;
+			positiveQue.pop();
+		}
+		else if (posLength > negLength)
+		{
+			// cout << "Neg ";
+			pos = negativeQue.top();
+			length += negLength;
+			negativeQue.pop();
+		}
+
+		else if (posLength == negLength)
+		{
+			if (positiveQue.top() < negativeQue.top())
+			{
+				// cout << "Pos ";
+				pos = positiveQue.top();
+				length += posLength;
+				positiveQue.pop();
+			}
+
+			else
+			{
+				// cout << "Neg ";
+				pos = negativeQue.top();
+				length += negLength;
+				negativeQue.pop();
+			}
+		}
+
+		// cout << pos << endl;
+	}
+
+	cout << length << endl;
 	return 0;
 }
