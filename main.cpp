@@ -14,6 +14,8 @@
 #include <iterator>
 #include <iomanip>
 #include <climits>
+#include <numeric>
+#include <cfloat>
 
 #define all(a) a.begin(), a.end()
 #define rall(a) a.rbegin(), a.rend()
@@ -26,38 +28,55 @@ using ll = long long;
 
 int main()
 {
-	int Q, V;
-	cin >> Q >> V;
-	priority_queue<int, vector<int>, less<int>> que;
+	int N, Q;
+	cin >> N >> Q;
 
-	for (int q = 0; q < Q; q++)
+	vector<int> P(N + 1, 0), PB(N + 1, 0);
+	for (int i = 1; i <= N; i++)
+	{
+		cin >> P[i];
+	}
+
+	for (int i = 1; i <= N; i++)
+	{
+		PB[P[i]] = i;
+	}
+
+	int *front = P.data();
+	int *back = PB.data();
+
+	while (Q--)
 	{
 		int type;
 		cin >> type;
 
 		if (type == 1)
 		{
-			int t, w;
-			cin >> t >> w;
+			int x, y;
+			cin >> x >> y;
 
-			que.push(w - t);
+			int buff;
+			buff = *(back + *(front + x));
+			*(back + *(front + x)) = *(back + *(front + y));
+			*(back + *(front + y)) = buff;
+
+			buff = *(front + x);
+			*(front + x) = *(front + y);
+			*(front + y) = buff;
 		}
-		else if (type == 2)
-		{
-			int t;
-			cin >> t;
 
-			if (que.empty())
-			{
-				cout << -1 << endl;
-			}
-			else
-			{
-				cout << min(V, que.top() + t) << endl;
-				que.pop();
-			}
+		else
+		{
+			int *buff;
+			buff = front;
+			front = back;
+			back = buff;
 		}
 	}
 
-	return 0;
+	for (int i = 1; i <= N; i++)
+	{
+		cout << *(front + i) << " ";
+	}
+	cout << endl;
 }
