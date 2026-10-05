@@ -31,19 +31,9 @@ int main()
 	int N, Q;
 	cin >> N >> Q;
 
-	vector<int> P(N + 1, 0), PB(N + 1, 0);
-	for (int i = 1; i <= N; i++)
-	{
-		cin >> P[i];
-	}
-
-	for (int i = 1; i <= N; i++)
-	{
-		PB[P[i]] = i;
-	}
-
-	int *front = P.data();
-	int *back = PB.data();
+	int ans = 0;
+	vector<int> A(N, 0);
+	set<int> nonZeroIndex;
 
 	while (Q--)
 	{
@@ -52,31 +42,41 @@ int main()
 
 		if (type == 1)
 		{
-			int x, y;
-			cin >> x >> y;
+			int x;
+			cin >> x;
+			x--;
 
-			int buff;
-			buff = *(back + *(front + x));
-			*(back + *(front + x)) = *(back + *(front + y));
-			*(back + *(front + y)) = buff;
+			if (!nonZeroIndex.count(x))
+				nonZeroIndex.insert(x);
 
-			buff = *(front + x);
-			*(front + x) = *(front + y);
-			*(front + y) = buff;
+			ans ^= A[x];
+			A[x]++;
+			ans ^= A[x];
 		}
 
 		else
 		{
-			int *buff;
-			buff = front;
-			front = back;
-			back = buff;
-		}
-	}
+			ans = 0;
+			auto iter = nonZeroIndex.begin();
+			while (iter != nonZeroIndex.end())
+			{
+				A[*iter]--;
+				ans ^= A[*iter];
 
-	for (int i = 1; i <= N; i++)
-	{
-		cout << *(front + i) << " ";
+				if (A[*iter] == 0)
+					iter = nonZeroIndex.erase(iter);
+				else
+					++iter;
+			}
+		}
+
+		// auto iter = nonZeroIndex.begin();
+		// while (iter != nonZeroIndex.end())
+		// {
+		// 	cout << *iter << " ";
+		// 	++iter;
+		// }
+
+		cout << ans << endl;
 	}
-	cout << endl;
 }
