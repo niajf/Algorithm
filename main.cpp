@@ -31,52 +31,99 @@ int main()
 	int N, Q;
 	cin >> N >> Q;
 
-	int ans = 0;
-	vector<int> A(N, 0);
-	set<int> nonZeroIndex;
+	vector<vector<int>> bestFromNode(N, vector<int>(2, 0));
+	vector<ll> L(N, INT_MAX), R(N, INT_MAX);
+	for (int i = 0; i < N - 1; i++)
+	{
+		cin >> L[i + 1];
+	}
+
+	for (int i = 0; i < N - 1; i++)
+	{
+		cin >> R[i];
+	}
+
+	{
+		ll best = L[N - 1];
+		int bestIdx = N - 1;
+		bestFromNode[N - 1][1] = -1;
+		for (int i = N - 2; i >= 0; i--)
+		{
+			bestFromNode[i][1] = bestIdx;
+
+			if (best > L[i])
+			{
+				best = L[i];
+				bestIdx = i;
+			}
+		}
+	}
+
+	{
+		ll best = R[0];
+		int bestIdx = 0;
+		bestFromNode[0][0] = -1;
+		for (int i = 1; i < N; i++)
+		{
+			bestFromNode[i][0] = bestIdx;
+
+			if (best > R[i])
+			{
+				best = R[i];
+				bestIdx = i;
+			}
+		}
+	}
+
+	for (auto i : L)
+	{
+		cout << i << " ";
+	}
+	cout << endl;
+
+	for (auto i : R)
+	{
+		cout << i << " ";
+	}
+	cout << endl;
+
+	cout << endl;
+	for (int i = 0; i < N; i++)
+	{
+		cout << bestFromNode[i][0] << " " << bestFromNode[i][1] << endl;
+	}
+	cout << endl;
 
 	while (Q--)
 	{
-		int type;
-		cin >> type;
+		int s, t;
+		cin >> s >> t;
 
-		if (type == 1)
+		s--;
+		t--;
+
+		if (s == 0)
 		{
-			int x;
-			cin >> x;
-			x--;
+			cout << R[s] << "\n";
+		}
 
-			if (!nonZeroIndex.count(x))
-				nonZeroIndex.insert(x);
-
-			ans ^= A[x];
-			A[x]++;
-			ans ^= A[x];
+		else if (s == N - 1)
+		{
+			cout << L[s] << "\n";
 		}
 
 		else
 		{
-			ans = 0;
-			auto iter = nonZeroIndex.begin();
-			while (iter != nonZeroIndex.end())
+			if (s < t)
 			{
-				A[*iter]--;
-				ans ^= A[*iter];
-
-				if (A[*iter] == 0)
-					iter = nonZeroIndex.erase(iter);
-				else
-					++iter;
+				cout << min(R[s], L[s] + R[bestFromNode[s][0]]) << "\n";
+			}
+			else if (s > t)
+			{
+				cout << min(L[s], R[s] + L[bestFromNode[s][1]]) << "\n";
 			}
 		}
-
-		// auto iter = nonZeroIndex.begin();
-		// while (iter != nonZeroIndex.end())
-		// {
-		// 	cout << *iter << " ";
-		// 	++iter;
-		// }
-
-		cout << ans << endl;
 	}
+
+	return 0;
 }
